@@ -1,0 +1,24 @@
+{
+  "name": "telegram-api-service",
+  "version": "1.0.0",
+  "description": "Telegram API service for gift monitoring system",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "telegram": "^2.26.22",
+    "@vercel/node": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "vercel": "^32.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
