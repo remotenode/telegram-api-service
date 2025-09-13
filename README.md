@@ -1,163 +1,126 @@
 # Telegram API Service
 
-A Vercel-based service that provides real Telegram API integration using gramjs for the gift monitoring system.
+A modular Telegram API service built with TypeScript and the telegram (gramjs) library for real MTProto integration.
 
 ## 🏗️ Architecture
 
 ```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│ Cloudflare      │    │ Vercel Service   │    │ Telegram        │
-│ Worker          │───▶│ (gramjs/MTProto) │───▶│ API             │
-│ (Monitoring)    │    │ (Real API calls) │    │ (User accounts) │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
+src/
+├── client/baseClient.ts       # Base client with connection management
+├── operations/
+│   ├── user/                  # User operations
+│   ├── channel/               # Channel operations
+│   ├── message/               # Message operations
+│   ├── media/                 # Media operations
+│   ├── chat/                  # Chat/dialog operations
+│   └── payment/               # Payment operations
+├── utils/typeGuards.ts        # Type checking utilities
+└── telegramService.ts         # Main service aggregating all operations
 ```
 
 ## 🚀 Features
 
-- **Real Telegram Integration**: Uses gramjs for MTProto protocol
-- **Gift Sending**: Send gifts to users and channels
-- **Balance Checking**: Get account balance
-- **Session Validation**: Validate Telegram sessions
-- **Gift Management**: Get available and received gifts
+- **Real Telegram MTProto Integration**: Uses telegram/gramjs for direct API access
+- **Modular Architecture**: Operations organized by category for maintainability
+- **Full API Coverage**: Implements real Telegram API methods, no mocks
+- **TypeScript Support**: Full type safety with TypeScript
 
 ## 📡 API Endpoints
 
-### POST `/api/send-gift`
-Send a gift to a user or channel.
-
-**Request Body:**
-```json
-{
-  "recipientId": "123456789",
-  "giftId": "gift_123",
-  "isChannel": false,
-  "accountType": "main",
-  "apiId": 24253232,
-  "apiHash": "d97a2ffae0a841a238284860378c35ab",
-  "sessionString": "your-session-string",
-  "userId": "123456789"
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "messageId": "12345"
-}
-```
-
-### POST `/api/get-gifts`
-Get available gifts for an account.
-
-**Request Body:**
-```json
-{
-  "accountType": "main",
-  "apiId": 24253232,
-  "apiHash": "d97a2ffae0a841a238284860378c35ab",
-  "sessionString": "your-session-string",
-  "userId": "123456789"
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "gifts": [
-    {
-      "id": "gift_1",
-      "gift_type": "Star",
-      "stars": 1,
-      "availability": 100
-    }
-  ]
-}
-```
-
-### POST `/api/get-balance`
-Get account balance.
-
-**Request Body:**
-```json
-{
-  "accountType": "main",
-  "apiId": 24253232,
-  "apiHash": "d97a2ffae0a841a238284860378c35ab",
-  "sessionString": "your-session-string",
-  "userId": "123456789"
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "balance": {
-    "stars": 50
-  }
-}
-```
-
 ### POST `/api/validate-session`
-Validate a Telegram session.
+Validate a Telegram session and get user information.
 
 **Request Body:**
 ```json
 {
   "accountType": "main",
-  "apiId": 24253232,
-  "apiHash": "d97a2ffae0a841a238284860378c35ab",
+  "apiId": 12345,
+  "apiHash": "your-api-hash",
   "sessionString": "your-session-string",
   "userId": "123456789"
 }
 ```
 
-**Response:**
-```json
-{
-  "success": true,
-  "isValid": true,
-  "userInfo": {
-    "id": "123456789",
-    "username": "username",
-    "first_name": "John",
-    "is_bot": false,
-    "is_premium": true
-  }
-}
-```
-
-### POST `/api/get-received-gifts`
-Get received gifts for a user.
+### POST `/api/get-similar-channels`
+Get channels similar to a specified channel.
 
 **Request Body:**
 ```json
 {
-  "accountType": "pull",
-  "apiId": 25072862,
-  "apiHash": "e494cd2e650002434b55deff94c24d0a",
+  "channelId": "@channelname",
+  "limit": 10,
+  "accountType": "main",
+  "apiId": 12345,
+  "apiHash": "your-api-hash",
   "sessionString": "your-session-string",
-  "userId": "123456789",
-  "targetUserId": "987654321"
+  "userId": "123456789"
 }
 ```
+
+## 📚 Available Operations
+
+### User Operations
+- `validateSession()` - Validate session and get user info
+- `getUsers(ids)` - Get users by IDs or usernames
+- `getUserPhotos(userId, limit)` - Get user profile photos
+- `updateProfile(updates)` - Update profile information
+- `getBlockedUsers(limit)` - Get list of blocked users
+
+### Channel Operations
+- `getSimilarChannels(channelId, limit)` - Get recommended similar channels
+- `getChannelInfo(channelId)` - Get full channel information
+- `getChannelParticipants(channelId, limit, filter)` - Get channel members
+- `searchChannels(query, limit)` - Search for channels/groups
+- `joinChannel(channelId)` - Join a channel
+- `leaveChannel(channelId)` - Leave a channel
+
+### Message Operations
+- `sendMessage(chatId, message, options)` - Send text message
+- `getMessages(chatId, limit, options)` - Get messages from chat
+- `deleteMessages(chatId, messageIds, revoke)` - Delete messages
+- `editMessage(chatId, messageId, newText, options)` - Edit message
+- `forwardMessages(fromChatId, toChatId, messageIds, options)` - Forward messages
+- `pinMessage(chatId, messageId, options)` - Pin/unpin message
+- `markAsRead(chatId, messageIds)` - Mark messages as read
+- `sendTyping(chatId, action)` - Send typing indicator
+
+### Media Operations
+- `sendPhoto(chatId, photo, options)` - Send photo
+- `sendDocument(chatId, document, options)` - Send document/file
+- `sendVideo(chatId, video, options)` - Send video
+- `sendVoice(chatId, voice, options)` - Send voice message
+- `downloadMedia(message, options)` - Download media
+- `sendAlbum(chatId, files, options)` - Send media album
+- `setChatPhoto(chatId, photo)` - Set chat/channel photo
+
+### Chat Operations
+- `getDialogs(limit, options)` - Get all chats/dialogs
+- `createGroup(title, users, about)` - Create new group
+- `deleteChat(chatId, options)` - Delete/leave chat
+- `archiveChat(chatId, archive)` - Archive/unarchive chat
+- `muteChat(chatId, muteUntil)` - Mute/unmute notifications
+- `clearHistory(chatId, options)` - Clear chat history
+- `getCommonChats(userId, limit)` - Get common chats with user
+- `reportChat(chatId, reason, comment)` - Report chat/channel
+
+### Payment Operations
+- `getPaymentForm(invoice)` - Get payment form
+- `sendPaymentForm(...)` - Send payment
+- `getPaymentReceipt(msgId, peer)` - Get payment receipt
+- `getPremiumGiftCodeOptions(boostPeer)` - Get premium gift options
+- `checkGiftCode(slug)` - Check gift code validity
+- `applyGiftCode(slug)` - Apply gift code
 
 ## 🛠️ Development
 
 ### Prerequisites
 - Node.js 18+
-- Vercel CLI
+- TypeScript
+- Vercel CLI (for deployment)
 
 ### Installation
 ```bash
 npm install
-```
-
-### Local Development
-```bash
-npm run dev
 ```
 
 ### Build
@@ -165,47 +128,52 @@ npm run dev
 npm run build
 ```
 
-### Deploy
+### Deploy to Vercel
 ```bash
 npm run deploy
 ```
 
-## 🔧 Configuration
+## 💻 Usage Example
 
-The service expects the following environment variables (passed in request body):
-- `apiId`: Telegram API ID
-- `apiHash`: Telegram API Hash
-- `sessionString`: Telegram session string
-- `userId`: Telegram user ID
-- `accountType`: Account type ("main" or "pull")
+```typescript
+import { TelegramService } from './src/telegramService';
+
+const telegram = new TelegramService({
+  apiId: 12345,
+  apiHash: 'your-api-hash',
+  sessionString: 'your-session-string',
+  userId: 'user-id'
+});
+
+// Validate session
+const session = await telegram.validateSession();
+
+// Get similar channels
+const similar = await telegram.channel.getSimilarChannels('@channelname', 10);
+
+// Send message
+const sent = await telegram.message.sendMessage('@username', 'Hello!');
+
+// Download media from a message
+const media = await telegram.media.downloadMedia(message);
+
+// Get all dialogs
+const dialogs = await telegram.chat.getDialogs(50);
+
+// Disconnect when done
+await telegram.disconnect();
+```
 
 ## 🔒 Security
 
-- All API calls require proper authentication
 - Session strings are validated before use
-- Rate limiting should be implemented at the Cloudflare Worker level
+- All operations use real Telegram API with proper error handling
 - Sensitive data is not logged
+- Connection management handled automatically
 
-## 📝 Usage from Cloudflare Worker
+## 📝 Notes
 
-```typescript
-// In your Cloudflare Worker
-async function sendGiftViaVercel(recipientId: string, giftId: string) {
-  const response = await fetch('https://your-vercel-app.vercel.app/api/send-gift', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      recipientId,
-      giftId,
-      accountType: 'main',
-      apiId: env.TELEGRAM_MAIN_API_ID,
-      apiHash: env.TELEGRAM_MAIN_API_HASH,
-      sessionString: env.TELEGRAM_MAIN_SESSION_STRING,
-      userId: env.MAIN_ACCOUNT_USER_ID
-    })
-  });
-  
-  return await response.json();
-}
-```
-
+- All operations use real Telegram MTProto API calls
+- Type conversions handle BigInt and complex Telegram types
+- Error handling returns consistent `{ success, error }` format
+- Connection is managed automatically but can be explicitly disconnected

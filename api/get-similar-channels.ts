@@ -54,11 +54,11 @@ export default async function handler(
       return;
     }
 
-    // Validate session string is not empty or placeholder
-    if (sessionString === '' || sessionString === 'test_session_string' || sessionString.includes('placeholder')) {
+    // Validate session string is not empty
+    if (!sessionString || sessionString.trim() === '') {
       res.status(400).json({
         success: false,
-        error: 'Valid session string is required. Please create a session using the Telegram bot.'
+        error: 'Valid session string is required.'
       });
       return;
     }

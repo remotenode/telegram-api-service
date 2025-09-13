@@ -86,13 +86,6 @@ src/
 - `getGiveawayInfo(peer, msgId)` - Get giveaway information
 - `launchPrepaidGiveaway(...)` - Launch prepaid giveaway
 
-## Legacy/Mock Operations
-
-The following operations don't have direct Telegram API equivalents and return placeholder responses:
-- `sendGift()` - Returns error (use premium gift codes instead)
-- `getAvailableGifts()` - Uses premium gift code options as alternative
-- `getBalance()` - Returns error (not available in standard API)
-- `getReceivedGifts()` - Returns error (would require message searching)
 
 ## Usage Example
 
@@ -128,4 +121,3 @@ await telegram.disconnect();
 2. Type conversions handle BigInt and complex Telegram types
 3. Error handling returns consistent `{ success, error }` format
 4. Connection is managed automatically but can be explicitly disconnected
-5. Some TypeScript type issues remain due to the telegram library's complex types
