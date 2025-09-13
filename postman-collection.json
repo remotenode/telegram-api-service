@@ -1,0 +1,110 @@
+{
+  "info": {
+    "name": "Telegram API Service",
+    "description": "A modular Telegram API service built with TypeScript and the telegram (gramjs) library for real MTProto integration.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Validate Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accountType\": \"main\",\n  \"apiId\": {{apiId}},\n  \"apiHash\": \"{{apiHash}}\",\n  \"sessionString\": \"{{sessionString}}\",\n  \"userId\": \"{{userId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/validate-session",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "validate-session"]
+            },
+            "description": "Validates a Telegram session and returns detailed user information including premium status, profile photo, and settings."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Channels",
+      "item": [
+        {
+          "name": "Get Similar Channels",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"channelId\": \"@channelname\",\n  \"limit\": 10,\n  \"accountType\": \"main\",\n  \"apiId\": {{apiId}},\n  \"apiHash\": \"{{apiHash}}\",\n  \"sessionString\": \"{{sessionString}}\",\n  \"userId\": \"{{userId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/get-similar-channels",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "get-similar-channels"]
+            },
+            "description": "Returns a list of channels similar to the specified channel using Telegram's recommendation algorithm."
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://your-vercel-app.vercel.app",
+      "type": "string"
+    },
+    {
+      "key": "apiId",
+      "value": "12345",
+      "type": "number"
+    },
+    {
+      "key": "apiHash",
+      "value": "your-api-hash-here",
+      "type": "string"
+    },
+    {
+      "key": "sessionString",
+      "value": "your-session-string-here",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "123456789",
+      "type": "string"
+    }
+  ]
+}

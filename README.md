@@ -25,9 +25,19 @@ src/
 - **Full API Coverage**: Implements real Telegram API methods, no mocks
 - **TypeScript Support**: Full type safety with TypeScript
 
-## 📡 API Endpoints
+## 📡 API Documentation
 
-### POST `/api/validate-session`
+### Interactive Documentation
+- **API Index**: `/api` - Landing page with links to all documentation
+- **Swagger UI**: `/api/docs` - Interactive API documentation with try-it-out functionality
+- **ReDoc**: `/api/redoc` - Clean, responsive API reference documentation
+- **OpenAPI Spec**: `/api/openapi` - Raw OpenAPI 3.0 specification in JSON format
+- **Postman Collection**: [postman-collection.json](./postman-collection.json) - Import into Postman
+- **Code Examples**: [API_EXAMPLES.md](./API_EXAMPLES.md) - Examples in multiple languages
+
+### API Endpoints
+
+#### POST `/api/validate-session`
 Validate a Telegram session and get user information.
 
 **Request Body:**
