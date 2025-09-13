@@ -43,3 +43,27 @@ export interface ValidateSessionResponse {
   error?: string;
 }
 
+export interface GetSimilarChannelsRequest {
+  channelId: string;
+  limit?: number;
+}
+
+export interface GetSimilarChannelsResponse {
+  success: boolean;
+  channels?: TelegramChannel[];
+  error?: string;
+}
+
+export interface TelegramChannel {
+  id: string;
+  title: string;
+  username?: string;
+  description?: string;
+  participants_count?: number;
+  is_verified?: boolean;
+  is_scam?: boolean;
+  is_fake?: boolean;
+  photo?: string;
+  type: 'channel' | 'supergroup' | 'group';
+}
+

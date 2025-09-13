@@ -1,13 +1,18 @@
 import { TelegramClient } from 'telegram';
 import { StringSession } from 'telegram/sessions';
 import { Api } from 'telegram/tl';
-import { TelegramConfig, TelegramGift } from './types';
+import { TelegramConfig, TelegramGift, TelegramChannel } from './types';
 
 export class TelegramClientService {
   private client: TelegramClient;
   private isConnected: boolean = false;
 
   constructor(private config: TelegramConfig) {
+    // Validate session string is provided and not empty
+    if (!config.sessionString || config.sessionString.trim() === '') {
+      throw new Error('Session string is required and cannot be empty');
+    }
+
     this.client = new TelegramClient(
       new StringSession(config.sessionString),
       config.apiId,
@@ -199,6 +204,70 @@ export class TelegramClientService {
         success: false,
         error: error.message || 'Unknown error occurred'
       };
+    }
+  }
+
+  async getSimilarChannels(channelId: string, limit: number = 10): Promise<{ success: boolean; channels?: TelegramChannel[]; error?: string }> {
+    try {
+      if (!this.isConnected) {
+        await this.initialize();
+      }
+
+      console.log(`Getting similar channels for ${channelId} (limit: ${limit})`);
+      
+      // Get the channel entity first
+      const channel = await this.client.getEntity(channelId);
+      
+      if (!channel) {
+        return {
+          success: false,
+          error: 'Channel not found'
+        };
+      }
+
+      // Use the official Telegram API method: channels.getChannelRecommendations
+      // This is the official method for getting similar channels
+      const result = await this.client.invoke(new Api.channels.GetChannelRecommendations({
+        channel: channel
+      }));
+
+      console.log(`Found ${result.chats.length} similar channels`);
+
+      // Convert the result to our TelegramChannel format
+      const channels: TelegramChannel[] = result.chats
+        .slice(0, limit)
+        .map((chat: any) => ({
+          id: chat.id?.toString() || '',
+          title: chat.title || '',
+          username: chat.username || undefined,
+          description: chat.about || undefined,
+          participants_count: chat.participantsCount || undefined,
+          is_verified: chat.verified || false,
+          is_scam: chat.scam || false,
+          is_fake: chat.fake || false,
+          type: this.getChannelType(chat)
+        }));
+
+      return {
+        success: true,
+        channels
+      };
+    } catch (error: any) {
+      console.error('Failed to get similar channels:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to get similar channels from Telegram API'
+      };
+    }
+  }
+
+  private getChannelType(chat: any): 'channel' | 'supergroup' | 'group' {
+    if (chat.broadcast) {
+      return 'channel';
+    } else if (chat.megagroup) {
+      return 'supergroup';
+    } else {
+      return 'group';
     }
   }
 }
