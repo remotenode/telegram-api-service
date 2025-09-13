@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { TelegramClientService } from '../src/telegramClient';
+import { TelegramService } from '../src/telegramService';
 import { GetSimilarChannelsRequest, GetSimilarChannelsResponse } from '../src/types';
 
 export default async function handler(
@@ -63,7 +63,7 @@ export default async function handler(
       return;
     }
 
-    const telegramService = new TelegramClientService({
+    const telegramService = new TelegramService({
       apiId,
       apiHash,
       sessionString,

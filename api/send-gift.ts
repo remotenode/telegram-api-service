@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { TelegramClientService } from '../src/telegramClient';
+import { TelegramService } from '../src/telegramService';
 import { SendGiftRequest, SendGiftResponse } from '../src/types';
 
 export default async function handler(
@@ -24,7 +24,7 @@ export default async function handler(
     }
 
     // Create Telegram client
-    const telegramClient = new TelegramClientService({
+    const telegramService = new TelegramService({
       apiId: parseInt(apiId),
       apiHash,
       sessionString,
@@ -32,10 +32,10 @@ export default async function handler(
     });
 
     // Send gift
-    const result = await telegramClient.sendGift(recipientId, giftId, isChannel || false);
+    const result = await telegramService.sendGift(recipientId, giftId, isChannel || false);
 
     // Disconnect client
-    await telegramClient.disconnect();
+    await telegramService.disconnect();
 
     const response: SendGiftResponse = {
       success: result.success,

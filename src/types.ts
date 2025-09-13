@@ -63,7 +63,7 @@ export interface TelegramChannel {
   is_verified?: boolean;
   is_scam?: boolean;
   is_fake?: boolean;
-  photo?: string;
+  photo?: string | any;
   type: 'channel' | 'supergroup' | 'group';
 }
 

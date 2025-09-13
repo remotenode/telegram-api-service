@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { TelegramClientService } from '../src/telegramClient';
+import { TelegramService } from '../src/telegramService';
 import { ValidateSessionResponse } from '../src/types';
 
 export default async function handler(
@@ -23,8 +23,8 @@ export default async function handler(
       return;
     }
 
-    // Create Telegram client
-    const telegramClient = new TelegramClientService({
+    // Create Telegram service
+    const telegramService = new TelegramService({
       apiId: parseInt(apiId),
       apiHash,
       sessionString,
@@ -32,10 +32,10 @@ export default async function handler(
     });
 
     // Validate session
-    const result = await telegramClient.validateSession();
+    const result = await telegramService.validateSession();
 
-    // Disconnect client
-    await telegramClient.disconnect();
+    // Disconnect service
+    await telegramService.disconnect();
 
     const response: ValidateSessionResponse = {
       success: result.success,
