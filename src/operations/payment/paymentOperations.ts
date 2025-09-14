@@ -10,6 +10,14 @@ export class PaymentOperations extends BaseTelegramClient {
     try {
       await this.ensureConnected();
 
+      // Validate invoice parameter
+      if (!invoice || typeof invoice !== 'object' || Object.keys(invoice).length === 0) {
+        return {
+          success: false,
+          error: 'Invalid invoice: invoice parameter is required and must be a valid invoice object'
+        };
+      }
+
       const form = await this.client.invoke(new Api.payments.GetPaymentForm({
         invoice: invoice,
         themeParams: undefined

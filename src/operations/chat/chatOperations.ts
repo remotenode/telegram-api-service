@@ -102,8 +102,26 @@ export class ChatOperations extends BaseTelegramClient {
         title: title
       }));
 
-      // Get the created chat info
-      const chat = (result as any).chats[0];
+      // Get the created chat info - handle different result structures
+      let chat;
+      if ((result as any).chats && (result as any).chats.length > 0) {
+        chat = (result as any).chats[0];
+      } else if ((result as any).updates && (result as any).updates.chats && (result as any).updates.chats.length > 0) {
+        // The result structure has updates.chats
+        chat = (result as any).updates.chats[0];
+      } else if ((result as any).updates && (result as any).updates.updates && (result as any).updates.updates.length > 0) {
+        // Sometimes the result is in updates.updates array
+        const update = (result as any).updates.updates.find((u: any) => u.className === 'UpdateNewMessage');
+        if (update && update.message && update.message.peerId) {
+          chat = update.message.peerId;
+        }
+      } else {
+        throw new Error(`Unexpected result structure from CreateChat: ${JSON.stringify(result)}`);
+      }
+
+      if (!chat) {
+        throw new Error('Failed to extract chat information from CreateChat result');
+      }
 
       // Update group description if provided
       if (about && chat.id) {
@@ -194,13 +212,17 @@ export class ChatOperations extends BaseTelegramClient {
     try {
       await this.ensureConnected();
 
-      const entity = await this.client.getEntity(chatId);
+      // Convert string chatId to number if needed
+      const numericChatId = typeof chatId === 'string' ? parseInt(chatId) : chatId;
+      
+      // Create the peer directly instead of using getEntity
+      const peer = new Api.InputPeerChat({ chatId: bigInt(numericChatId) });
       const folderId = archive ? 1 : 0; // 1 for archive, 0 for main
 
       await this.client.invoke(new Api.folders.EditPeerFolders({
         folderPeers: [
           new Api.InputFolderPeer({
-            peer: entity as any,
+            peer: peer,
             folderId: folderId
           })
         ]

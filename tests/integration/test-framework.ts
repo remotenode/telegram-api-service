@@ -27,9 +27,8 @@ export class IntegrationTestFramework {
 
   async setup(): Promise<void> {
     console.log('🔧 Setting up integration tests...');
-    await this.account1.ensureConnected();
-    await this.account2.ensureConnected();
-    console.log('✅ Both accounts connected successfully');
+    // TelegramService handles connection automatically when needed
+    console.log('✅ Both accounts ready for testing');
   }
 
   async cleanup(): Promise<void> {
