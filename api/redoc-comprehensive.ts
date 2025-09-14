@@ -7,7 +7,7 @@ export default function handler(
   if (req.method === 'GET') {
     // Get the host from request headers
     const protocol = req.headers['x-forwarded-proto'] || 'https';
-    const host = req.headers['host'] || 'your-vercel-app.vercel.app';
+    const host = req.headers['host'] || 'telegram-api.aso.market';
     const specUrl = `${protocol}://${host}/api/openapi-comprehensive`;
     
     // Serve ReDoc HTML

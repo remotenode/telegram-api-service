@@ -21,7 +21,7 @@ export default function handler(
     
     // Get the host from request headers
     const protocol = req.headers['x-forwarded-proto'] || 'https';
-    const host = req.headers['host'] || 'your-vercel-app.vercel.app';
+    const host = req.headers['host'] || 'telegram-api.aso.market';
     
     if (spec.servers && spec.servers.length > 0) {
       spec.servers[0].url = `${protocol}://${host}`;

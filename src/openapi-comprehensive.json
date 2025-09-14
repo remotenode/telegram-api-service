@@ -15,7 +15,7 @@
   },
   "servers": [
     {
-      "url": "https://your-vercel-app.vercel.app",
+      "url": "https://telegram-api.aso.market",
       "description": "Production server"
     },
     {
