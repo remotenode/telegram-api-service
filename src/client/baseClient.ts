@@ -46,7 +46,6 @@ export class BaseTelegramClient {
         },
       });
       this.isConnected = true;
-      console.log('Telegram client initialized successfully');
     } catch (error) {
       console.error('Failed to initialize Telegram client:', error);
       throw error;
@@ -57,7 +56,6 @@ export class BaseTelegramClient {
     if (this.isConnected) {
       await this.client.disconnect();
       this.isConnected = false;
-      console.log('Telegram client disconnected');
     }
   }
 }

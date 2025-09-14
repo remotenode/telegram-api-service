@@ -11,8 +11,6 @@ export class ChannelOperations extends BaseTelegramClient {
     try {
       await this.ensureConnected();
 
-      console.log(`Getting similar channels for ${channelId} (limit: ${limit})`);
-      
       // Get the channel entity first
       const channel = await this.client.getEntity(channelId);
       
@@ -27,8 +25,6 @@ export class ChannelOperations extends BaseTelegramClient {
       const result = await this.client.invoke(new Api.channels.GetChannelRecommendations({
         channel: channel
       }));
-
-      console.log(`Found ${result.chats.length} similar channels`);
 
       // Convert the result to our TelegramChannel format
       const channels: TelegramChannel[] = result.chats
