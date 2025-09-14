@@ -171,17 +171,6 @@
             "description": "Telegram user ID"
           }
         ],
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {}
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Successful response",
@@ -416,14 +405,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "userId"
-                ],
                 "properties": {
-                  "userId": {
-                    "type": "string",
-                    "description": "User ID"
-                  },
                   "limit": {
                     "type": "integer",
                     "default": 10,
@@ -2072,14 +2054,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "userId"
-                ],
                 "properties": {
-                  "userId": {
-                    "type": "string",
-                    "description": "User ID"
-                  },
                   "limit": {
                     "type": "integer",
                     "default": 100,
@@ -4189,17 +4164,6 @@
             "description": "Telegram user ID"
           }
         ],
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {}
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Successful response",
