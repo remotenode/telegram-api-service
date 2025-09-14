@@ -17,13 +17,7 @@ export default createApiHandler(
       throw new Error('Chat ID is required');
     }
 
-    return await telegramService.message.getMessageHistory(chatId, limit, {
-      offsetId,
-      offsetDate,
-      addOffset,
-      maxId,
-      minId
-    });
+    return await telegramService.message.getMessageHistory(chatId, limit, offsetId);
   },
   {
     requireBody: true,
