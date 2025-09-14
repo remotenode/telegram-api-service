@@ -1,43 +1,52 @@
 import { Api } from 'telegram/tl';
-import bigInt from 'big-integer';
-import { getFileInfo } from 'telegram/Utils';
-import { CustomFile } from 'telegram/client/uploads';
 import { BaseTelegramClient } from '../../client/baseClient';
-import { Buffer } from 'buffer';
+import { SendVideoOperation } from './sendVideo';
+import { SendVoiceOperation } from './sendVoice';
+import { SendAlbumOperation } from './sendAlbum';
+import { SendStickerOperation } from './sendSticker';
 
 export class MediaOperations extends BaseTelegramClient {
+  private sendVideoOp: SendVideoOperation;
+  private sendVoiceOp: SendVoiceOperation;
+  private sendAlbumOp: SendAlbumOperation;
+  private sendStickerOp: SendStickerOperation;
+
+  constructor(config: any) {
+    super(config);
+    this.sendVideoOp = new SendVideoOperation(this.client);
+    this.sendVoiceOp = new SendVoiceOperation(this.client);
+    this.sendAlbumOp = new SendAlbumOperation(this.client);
+    this.sendStickerOp = new SendStickerOperation(this.client);
+  }
+
   /**
-   * Upload and send a photo
+   * Send a photo to a chat
    */
   async sendPhoto(chatId: string | number, photo: Buffer | string, options?: {
     caption?: string;
-    parseMode?: 'md' | 'html';
     replyTo?: number;
     silent?: boolean;
-    scheduleDate?: number;
-    compress?: boolean;
   }): Promise<{ success: boolean; message?: any; error?: string }> {
     try {
       await this.ensureConnected();
 
       const entity = await this.client.getEntity(chatId);
-      const message = await this.client.sendFile(entity, {
+      const sentMessage = await this.client.sendFile(entity, {
         file: photo,
         caption: options?.caption,
-        parseMode: options?.parseMode,
         replyTo: options?.replyTo,
-        silent: options?.silent,
-        scheduleDate: options?.scheduleDate,
-        forceDocument: !options?.compress
+        silent: options?.silent
       });
 
       return {
         success: true,
         message: {
-          id: message.id,
-          date: message.date,
-          media: message.media,
-          caption: message.message
+          id: sentMessage.id,
+          text: sentMessage.message,
+          date: sentMessage.date,
+          fromId: sentMessage.fromId?.toString(),
+          peerId: sentMessage.peerId?.toString(),
+          media: sentMessage.media
         }
       };
     } catch (error: any) {
@@ -50,44 +59,34 @@ export class MediaOperations extends BaseTelegramClient {
   }
 
   /**
-   * Upload and send a document/file
+   * Send a document to a chat
    */
   async sendDocument(chatId: string | number, document: Buffer | string, options?: {
-    filename?: string;
     caption?: string;
-    parseMode?: 'md' | 'html';
+    fileName?: string;
     replyTo?: number;
     silent?: boolean;
-    scheduleDate?: number;
-    thumb?: Buffer | string;
-    progressCallback?: (progress: number) => void;
   }): Promise<{ success: boolean; message?: any; error?: string }> {
     try {
       await this.ensureConnected();
 
       const entity = await this.client.getEntity(chatId);
-      const message = await this.client.sendFile(entity, {
+      const sentMessage = await this.client.sendFile(entity, {
         file: document,
         caption: options?.caption,
-        parseMode: options?.parseMode,
         replyTo: options?.replyTo,
-        silent: options?.silent,
-        scheduleDate: options?.scheduleDate,
-        thumb: options?.thumb,
-        forceDocument: true,
-        attributes: options?.filename ? [
-          new Api.DocumentAttributeFilename({ fileName: options.filename })
-        ] : undefined,
-        progressCallback: options?.progressCallback
+        silent: options?.silent
       });
 
       return {
         success: true,
         message: {
-          id: message.id,
-          date: message.date,
-          media: message.media,
-          caption: message.message
+          id: sentMessage.id,
+          text: sentMessage.message,
+          date: sentMessage.date,
+          fromId: sentMessage.fromId?.toString(),
+          peerId: sentMessage.peerId?.toString(),
+          media: sentMessage.media
         }
       };
     } catch (error: any) {
@@ -102,34 +101,35 @@ export class MediaOperations extends BaseTelegramClient {
   /**
    * Download media from a message
    */
-  async downloadMedia(messageOrMedia: any, options?: {
-    outputPath?: string;
-    progressCallback?: (progress: number) => void;
-  }): Promise<{ success: boolean; buffer?: Buffer; path?: string; error?: string }> {
+  async downloadMedia(chatId: string | number, messageId: number, options?: {
+    filePath?: string;
+  }): Promise<{ success: boolean; filePath?: string; error?: string }> {
     try {
       await this.ensureConnected();
 
-      const buffer = await this.client.downloadMedia(messageOrMedia, {
-        progressCallback: options?.progressCallback ? (downloaded: bigInt.BigInteger, total: bigInt.BigInteger) => {
-          // Convert BigInteger to number for the user's callback
-          const progress = total.isZero() ? 0 : downloaded.toJSNumber() / total.toJSNumber();
-          options.progressCallback!(progress);
-        } : undefined
-      });
-
-      if (!buffer) {
+      const entity = await this.client.getEntity(chatId);
+      const messages = await this.client.getMessages(entity, { ids: messageId });
+      
+      if (messages.length === 0) {
         return {
           success: false,
-          error: 'No media found in message'
+          error: 'Message not found'
         };
       }
 
-      // If outputPath is provided, we'd need to save it to file system
-      // For now, just return the buffer
+      const message = messages[0];
+      if (!message.media) {
+        return {
+          success: false,
+          error: 'Message has no media'
+        };
+      }
+
+      const filePath = await this.client.downloadMedia(message, options?.filePath as any);
+
       return {
         success: true,
-        buffer: Buffer.from(buffer),
-        path: options?.outputPath
+        filePath: filePath as string
       };
     } catch (error: any) {
       console.error('Failed to download media:', error);
@@ -141,106 +141,42 @@ export class MediaOperations extends BaseTelegramClient {
   }
 
   /**
-   * Get file information
+   * Get chat photo
    */
-  async getFileInfo(fileLocation: any): Promise<{ success: boolean; fileInfo?: any; error?: string }> {
-    try {
-      await this.ensureConnected();
-
-      // Get file information
-      const fileInfo = getFileInfo(fileLocation);
-
-      return {
-        success: true,
-        fileInfo: fileInfo
-      };
-    } catch (error: any) {
-      console.error('Failed to get file info:', error);
-      return {
-        success: false,
-        error: error.message || 'Failed to get file info'
-      };
-    }
-  }
-
-  /**
-   * Send media group (album)
-   */
-  async sendAlbum(chatId: string | number, files: Array<Buffer | string>, options?: {
-    captions?: string[];
-    parseMode?: 'md' | 'html';
-    replyTo?: number;
-    silent?: boolean;
-    scheduleDate?: number;
-  }): Promise<{ success: boolean; messages?: any[]; error?: string }> {
+  async getChatPhoto(chatId: string | number): Promise<{ success: boolean; photo?: any; error?: string }> {
     try {
       await this.ensureConnected();
 
       const entity = await this.client.getEntity(chatId);
-      const messages = await this.client.sendFile(entity, {
-        file: files,
-        caption: options?.captions,
-        parseMode: options?.parseMode,
-        replyTo: options?.replyTo,
-        silent: options?.silent,
-        scheduleDate: options?.scheduleDate
-      });
+      const fullChat = await this.client.invoke(new Api.messages.GetFullChat({
+        chatId: entity.id
+      }));
 
       return {
         success: true,
-        messages: Array.isArray(messages) ? messages.map(msg => ({
-          id: msg.id,
-          date: msg.date,
-          media: msg.media,
-          caption: msg.message
-        })) : [{
-          id: messages.id,
-          date: messages.date,
-          media: messages.media,
-          caption: messages.message
-        }]
+        photo: fullChat.fullChat.chatPhoto
       };
     } catch (error: any) {
-      console.error('Failed to send album:', error);
+      console.error('Failed to get chat photo:', error);
       return {
         success: false,
-        error: error.message || 'Failed to send album'
+        error: error.message || 'Failed to get chat photo'
       };
     }
   }
 
   /**
-   * Set chat/channel photo
+   * Set chat photo
    */
   async setChatPhoto(chatId: string | number, photo: Buffer | string): Promise<{ success: boolean; error?: string }> {
     try {
       await this.ensureConnected();
 
       const entity = await this.client.getEntity(chatId);
-      
-      // Upload the photo first
-      const customFile = new CustomFile('photo.jpg', Buffer.isBuffer(photo) ? photo.length : photo.length, '', Buffer.isBuffer(photo) ? photo : Buffer.from(photo));
-      const file = await this.client.uploadFile({
-        file: customFile,
-        workers: 1
-      });
-
-      // Check if it's a channel/supergroup or regular chat
-      if ('broadcast' in entity || 'megagroup' in entity) {
-        await this.client.invoke(new Api.channels.EditPhoto({
-          channel: entity,
-          photo: new Api.InputChatUploadedPhoto({
-            file: file
-          })
-        }));
-      } else {
-        await this.client.invoke(new Api.messages.EditChatPhoto({
-          chatId: entity.id,
-          photo: new Api.InputChatUploadedPhoto({
-            file: file
-          })
-        }));
-      }
+      await this.client.invoke(new Api.photos.UploadProfilePhoto({
+        file: await this.client.uploadFile({ file: photo as any, workers: 1 }),
+        bot: entity.className === 'User' && (entity as any).bot ? entity : undefined
+      }));
 
       return {
         success: true
@@ -250,143 +186,6 @@ export class MediaOperations extends BaseTelegramClient {
       return {
         success: false,
         error: error.message || 'Failed to set chat photo'
-      };
-    }
-  }
-
-  /**
-   * Delete chat/channel photo
-   */
-  async deleteChatPhoto(chatId: string | number): Promise<{ success: boolean; error?: string }> {
-    try {
-      await this.ensureConnected();
-
-      const entity = await this.client.getEntity(chatId);
-      
-      // Check if it's a channel/supergroup or regular chat
-      if ('broadcast' in entity || 'megagroup' in entity) {
-        await this.client.invoke(new Api.channels.EditPhoto({
-          channel: entity,
-          photo: new Api.InputChatPhotoEmpty()
-        }));
-      } else {
-        await this.client.invoke(new Api.messages.EditChatPhoto({
-          chatId: entity.id,
-          photo: new Api.InputChatPhotoEmpty()
-        }));
-      }
-
-      return {
-        success: true
-      };
-    } catch (error: any) {
-      console.error('Failed to delete chat photo:', error);
-      return {
-        success: false,
-        error: error.message || 'Failed to delete chat photo'
-      };
-    }
-  }
-
-  /**
-   * Send voice message
-   */
-  async sendVoice(chatId: string | number, voice: Buffer | string, options?: {
-    duration?: number;
-    waveform?: number[];
-    caption?: string;
-    parseMode?: 'md' | 'html';
-    replyTo?: number;
-    silent?: boolean;
-  }): Promise<{ success: boolean; message?: any; error?: string }> {
-    try {
-      await this.ensureConnected();
-
-      const entity = await this.client.getEntity(chatId);
-      const message = await this.client.sendFile(entity, {
-        file: voice,
-        caption: options?.caption,
-        parseMode: options?.parseMode,
-        replyTo: options?.replyTo,
-        silent: options?.silent,
-        attributes: [
-          new Api.DocumentAttributeAudio({
-            voice: true,
-            duration: options?.duration || 0,
-            waveform: Buffer.from(options?.waveform || [])
-          })
-        ]
-      });
-
-      return {
-        success: true,
-        message: {
-          id: message.id,
-          date: message.date,
-          media: message.media,
-          caption: message.message
-        }
-      };
-    } catch (error: any) {
-      console.error('Failed to send voice message:', error);
-      return {
-        success: false,
-        error: error.message || 'Failed to send voice message'
-      };
-    }
-  }
-
-  /**
-   * Send video
-   */
-  async sendVideo(chatId: string | number, video: Buffer | string, options?: {
-    duration?: number;
-    width?: number;
-    height?: number;
-    thumb?: Buffer | string;
-    caption?: string;
-    parseMode?: 'md' | 'html';
-    replyTo?: number;
-    silent?: boolean;
-    supportsStreaming?: boolean;
-    progressCallback?: (progress: number) => void;
-  }): Promise<{ success: boolean; message?: any; error?: string }> {
-    try {
-      await this.ensureConnected();
-
-      const entity = await this.client.getEntity(chatId);
-      const message = await this.client.sendFile(entity, {
-        file: video,
-        caption: options?.caption,
-        parseMode: options?.parseMode,
-        replyTo: options?.replyTo,
-        silent: options?.silent,
-        thumb: options?.thumb,
-        progressCallback: options?.progressCallback,
-        attributes: [
-          new Api.DocumentAttributeVideo({
-            duration: options?.duration || 0,
-            w: options?.width || 0,
-            h: options?.height || 0,
-            supportsStreaming: options?.supportsStreaming || false
-          })
-        ]
-      });
-
-      return {
-        success: true,
-        message: {
-          id: message.id,
-          date: message.date,
-          media: message.media,
-          caption: message.message
-        }
-      };
-    } catch (error: any) {
-      console.error('Failed to send video:', error);
-      return {
-        success: false,
-        error: error.message || 'Failed to send video'
       };
     }
   }
@@ -403,39 +202,7 @@ export class MediaOperations extends BaseTelegramClient {
     replyTo?: number;
     silent?: boolean;
   }): Promise<{ success: boolean; message?: any; error?: string }> {
-    try {
-      await this.ensureConnected();
-
-      const entity = await this.client.getEntity(chatId);
-      const sentMessage = await this.client.sendFile(entity, {
-        file: video,
-        caption: options?.caption,
-        duration: options?.duration,
-        width: options?.width,
-        height: options?.height,
-        thumb: options?.thumb,
-        replyTo: options?.replyTo,
-        silent: options?.silent
-      });
-
-      return {
-        success: true,
-        message: {
-          id: sentMessage.id,
-          text: sentMessage.message,
-          date: sentMessage.date,
-          fromId: sentMessage.fromId?.toString(),
-          peerId: sentMessage.peerId?.toString(),
-          media: sentMessage.media
-        }
-      };
-    } catch (error: any) {
-      console.error('Failed to send video:', error);
-      return {
-        success: false,
-        error: error.message || 'Failed to send video'
-      };
-    }
+    return this.sendVideoOp.sendVideo(chatId, video, options);
   }
 
   /**
@@ -447,37 +214,7 @@ export class MediaOperations extends BaseTelegramClient {
     replyTo?: number;
     silent?: boolean;
   }): Promise<{ success: boolean; message?: any; error?: string }> {
-    try {
-      await this.ensureConnected();
-
-      const entity = await this.client.getEntity(chatId);
-      const sentMessage = await this.client.sendFile(entity, {
-        file: voice,
-        duration: options?.duration,
-        waveform: options?.waveform,
-        replyTo: options?.replyTo,
-        silent: options?.silent,
-        voiceNote: true
-      });
-
-      return {
-        success: true,
-        message: {
-          id: sentMessage.id,
-          text: sentMessage.message,
-          date: sentMessage.date,
-          fromId: sentMessage.fromId?.toString(),
-          peerId: sentMessage.peerId?.toString(),
-          media: sentMessage.media
-        }
-      };
-    } catch (error: any) {
-      console.error('Failed to send voice:', error);
-      return {
-        success: false,
-        error: error.message || 'Failed to send voice'
-      };
-    }
+    return this.sendVoiceOp.sendVoice(chatId, voice, options);
   }
 
   /**
@@ -488,42 +225,7 @@ export class MediaOperations extends BaseTelegramClient {
     replyTo?: number;
     silent?: boolean;
   }): Promise<{ success: boolean; messages?: any[]; error?: string }> {
-    try {
-      await this.ensureConnected();
-
-      const entity = await this.client.getEntity(chatId);
-      const sentMessages = await this.client.sendFile(entity, {
-        file: files,
-        caption: options?.captions,
-        replyTo: options?.replyTo,
-        silent: options?.silent
-      });
-
-      return {
-        success: true,
-        messages: Array.isArray(sentMessages) ? sentMessages.map(msg => ({
-          id: msg.id,
-          text: msg.message,
-          date: msg.date,
-          fromId: msg.fromId?.toString(),
-          peerId: msg.peerId?.toString(),
-          media: msg.media
-        })) : [{
-          id: sentMessages.id,
-          text: sentMessages.message,
-          date: sentMessages.date,
-          fromId: sentMessages.fromId?.toString(),
-          peerId: sentMessages.peerId?.toString(),
-          media: sentMessages.media
-        }]
-      };
-    } catch (error: any) {
-      console.error('Failed to send album:', error);
-      return {
-        success: false,
-        error: error.message || 'Failed to send album'
-      };
-    }
+    return this.sendAlbumOp.sendAlbum(chatId, files, options);
   }
 
   /**
@@ -533,34 +235,6 @@ export class MediaOperations extends BaseTelegramClient {
     replyTo?: number;
     silent?: boolean;
   }): Promise<{ success: boolean; message?: any; error?: string }> {
-    try {
-      await this.ensureConnected();
-
-      const entity = await this.client.getEntity(chatId);
-      const sentMessage = await this.client.sendFile(entity, {
-        file: sticker,
-        replyTo: options?.replyTo,
-        silent: options?.silent,
-        sticker: true
-      });
-
-      return {
-        success: true,
-        message: {
-          id: sentMessage.id,
-          text: sentMessage.message,
-          date: sentMessage.date,
-          fromId: sentMessage.fromId?.toString(),
-          peerId: sentMessage.peerId?.toString(),
-          media: sentMessage.media
-        }
-      };
-    } catch (error: any) {
-      console.error('Failed to send sticker:', error);
-      return {
-        success: false,
-        error: error.message || 'Failed to send sticker'
-      };
-    }
+    return this.sendStickerOp.sendSticker(chatId, sticker, options);
   }
 }

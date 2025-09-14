@@ -1,8 +1,25 @@
 import { Api } from 'telegram/tl';
 import { BaseTelegramClient } from '../../client/baseClient';
 import { NewMessage } from 'telegram/events';
+import { MarkAsReadOperation } from './markAsRead';
+import { SendTypingOperation } from './sendTyping';
+import { GetMessageReactionsOperation } from './getMessageReactions';
+import { SetMessageReactionOperation } from './setMessageReaction';
 
 export class MessageOperations extends BaseTelegramClient {
+  private markAsReadOp: MarkAsReadOperation;
+  private sendTypingOp: SendTypingOperation;
+  private getMessageReactionsOp: GetMessageReactionsOperation;
+  private setMessageReactionOp: SetMessageReactionOperation;
+
+  constructor(config: any) {
+    super(config);
+    this.markAsReadOp = new MarkAsReadOperation(this.client);
+    this.sendTypingOp = new SendTypingOperation(this.client);
+    this.getMessageReactionsOp = new GetMessageReactionsOperation(this.client);
+    this.setMessageReactionOp = new SetMessageReactionOperation(this.client);
+  }
+
   /**
    * Send a message to a user or channel
    */
@@ -18,10 +35,10 @@ export class MessageOperations extends BaseTelegramClient {
 
       const entity = await this.client.getEntity(chatId);
       const sentMessage = await this.client.sendMessage(entity, {
-        message,
+        message: message,
         replyTo: options?.replyTo,
         parseMode: options?.parseMode,
-        linkPreview: options?.linkPreview !== false,
+        linkPreview: options?.linkPreview,
         silent: options?.silent,
         schedule: options?.scheduleDate
       });
@@ -30,17 +47,8 @@ export class MessageOperations extends BaseTelegramClient {
         success: true,
         message: {
           id: sentMessage.id,
-          message: sentMessage.message,
+          text: sentMessage.message,
           date: sentMessage.date,
-          out: sentMessage.out,
-          mentioned: sentMessage.mentioned,
-          mediaUnread: sentMessage.mediaUnread,
-          silent: sentMessage.silent,
-          post: sentMessage.post,
-          fromScheduled: sentMessage.fromScheduled,
-          legacy: sentMessage.legacy,
-          editHide: sentMessage.editHide,
-          pinned: sentMessage.pinned,
           fromId: sentMessage.fromId?.toString(),
           peerId: sentMessage.peerId?.toString()
         }
@@ -55,64 +63,61 @@ export class MessageOperations extends BaseTelegramClient {
   }
 
   /**
-   * Get messages from a chat
+   * Get message history for a chat
    */
-  async getMessages(chatId: string | number, limit: number = 100, options?: {
-    offsetId?: number;
-    offsetDate?: number;
-    addOffset?: number;
-    maxId?: number;
-    minId?: number;
-    search?: string;
-    fromUser?: string | number;
-  }): Promise<{ success: boolean; messages?: any[]; error?: string }> {
+  async getMessageHistory(chatId: string | number, limit: number = 50, offsetId?: number): Promise<{ success: boolean; messages?: any[]; error?: string }> {
     try {
       await this.ensureConnected();
 
       const entity = await this.client.getEntity(chatId);
       const messages = await this.client.getMessages(entity, {
-        limit,
-        offsetId: options?.offsetId,
-        offsetDate: options?.offsetDate,
-        addOffset: options?.addOffset,
-        maxId: options?.maxId,
-        minId: options?.minId,
-        search: options?.search,
-        fromUser: options?.fromUser
+        limit: limit,
+        offsetId: offsetId
       });
 
       return {
         success: true,
         messages: messages.map(msg => ({
           id: msg.id,
-          message: msg.message,
+          text: msg.message,
           date: msg.date,
-          out: msg.out,
-          mentioned: msg.mentioned,
-          mediaUnread: msg.mediaUnread,
-          silent: msg.silent,
-          post: msg.post,
-          fromScheduled: msg.fromScheduled,
-          legacy: msg.legacy,
-          editHide: msg.editHide,
-          pinned: msg.pinned,
           fromId: msg.fromId?.toString(),
           peerId: msg.peerId?.toString(),
-          fwdFrom: msg.fwdFrom,
-          viaBotId: msg.viaBotId?.toString(),
-          replyTo: msg.replyTo,
           media: msg.media,
-          replyMarkup: msg.replyMarkup,
-          entities: msg.entities,
-          views: msg.views,
-          forwards: msg.forwards,
-          replies: msg.replies,
-          editDate: msg.editDate,
-          postAuthor: msg.postAuthor,
-          groupedId: msg.groupedId?.toString(),
-          reactions: msg.reactions,
-          restrictionReason: msg.restrictionReason,
-          ttlPeriod: msg.ttlPeriod
+          replyTo: msg.replyTo
+        }))
+      };
+    } catch (error: any) {
+      console.error('Failed to get message history:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to get message history'
+      };
+    }
+  }
+
+  /**
+   * Get specific messages by IDs
+   */
+  async getMessages(chatId: string | number, messageIds: number[]): Promise<{ success: boolean; messages?: any[]; error?: string }> {
+    try {
+      await this.ensureConnected();
+
+      const entity = await this.client.getEntity(chatId);
+      const messages = await this.client.getMessages(entity, {
+        ids: messageIds
+      });
+
+      return {
+        success: true,
+        messages: messages.map(msg => ({
+          id: msg.id,
+          text: msg.message,
+          date: msg.date,
+          fromId: msg.fromId?.toString(),
+          peerId: msg.peerId?.toString(),
+          media: msg.media,
+          replyTo: msg.replyTo
         }))
       };
     } catch (error: any) {
@@ -120,28 +125,6 @@ export class MessageOperations extends BaseTelegramClient {
       return {
         success: false,
         error: error.message || 'Failed to get messages'
-      };
-    }
-  }
-
-  /**
-   * Delete messages
-   */
-  async deleteMessages(chatId: string | number, messageIds: number[], revoke: boolean = true): Promise<{ success: boolean; error?: string }> {
-    try {
-      await this.ensureConnected();
-
-      const entity = await this.client.getEntity(chatId);
-      await this.client.deleteMessages(entity, messageIds, { revoke });
-
-      return {
-        success: true
-      };
-    } catch (error: any) {
-      console.error('Failed to delete messages:', error);
-      return {
-        success: false,
-        error: error.message || 'Failed to delete messages'
       };
     }
   }
@@ -161,15 +144,17 @@ export class MessageOperations extends BaseTelegramClient {
         message: messageId,
         text: newText,
         parseMode: options?.parseMode,
-        linkPreview: options?.linkPreview !== false
+        linkPreview: options?.linkPreview
       });
 
       return {
         success: true,
         message: {
           id: editedMessage.id,
-          message: editedMessage.message,
+          text: editedMessage.message,
           date: editedMessage.date,
+          fromId: editedMessage.fromId?.toString(),
+          peerId: editedMessage.peerId?.toString(),
           editDate: editedMessage.editDate
         }
       };
@@ -183,37 +168,62 @@ export class MessageOperations extends BaseTelegramClient {
   }
 
   /**
+   * Delete messages
+   */
+  async deleteMessages(chatId: string | number, messageIds: number[], revoke?: boolean): Promise<{ success: boolean; error?: string }> {
+    try {
+      await this.ensureConnected();
+
+      const entity = await this.client.getEntity(chatId);
+      await this.client.deleteMessages(entity, messageIds, { revoke });
+
+      return {
+        success: true
+      };
+    } catch (error: any) {
+      console.error('Failed to delete messages:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to delete messages'
+      };
+    }
+  }
+
+  /**
    * Forward messages
    */
   async forwardMessages(fromChatId: string | number, toChatId: string | number, messageIds: number[], options?: {
     silent?: boolean;
-    background?: boolean;
-    withMyScore?: boolean;
-    dropAuthor?: boolean;
-    dropMediaCaptions?: boolean;
+    scheduleDate?: number;
   }): Promise<{ success: boolean; messages?: any[]; error?: string }> {
     try {
       await this.ensureConnected();
 
       const fromEntity = await this.client.getEntity(fromChatId);
       const toEntity = await this.client.getEntity(toChatId);
-
-      const forwarded = await this.client.forwardMessages(toEntity, {
+      
+      const forwardedMessages = await this.client.forwardMessages(toEntity, {
         messages: messageIds,
         fromPeer: fromEntity,
         silent: options?.silent,
-        dropAuthor: options?.dropAuthor,
+        schedule: options?.scheduleDate
       });
 
       return {
         success: true,
-        messages: forwarded.map(msg => ({
+        messages: Array.isArray(forwardedMessages) ? forwardedMessages.map(msg => ({
           id: msg.id,
-          message: msg.message,
+          text: msg.message,
           date: msg.date,
           fromId: msg.fromId?.toString(),
           peerId: msg.peerId?.toString()
-        }))
+        })) : [{
+          id: (forwardedMessages as any).id,
+          text: (forwardedMessages as any).message,
+          date: (forwardedMessages as any).date,
+          fromId: (forwardedMessages as any).fromId?.toString(),
+          peerId: (forwardedMessages as any).peerId?.toString()
+        }]
       };
     } catch (error: any) {
       console.error('Failed to forward messages:', error);
@@ -225,21 +235,14 @@ export class MessageOperations extends BaseTelegramClient {
   }
 
   /**
-   * Pin a message in a chat
+   * Pin a message
    */
-  async pinMessage(chatId: string | number, messageId: number, options?: {
-    silent?: boolean;
-    unpin?: boolean;
-    pmOneside?: boolean;
-  }): Promise<{ success: boolean; error?: string }> {
+  async pinMessage(chatId: string | number, messageId: number, notify?: boolean): Promise<{ success: boolean; error?: string }> {
     try {
       await this.ensureConnected();
 
       const entity = await this.client.getEntity(chatId);
-      await this.client.pinMessage(entity, messageId, {
-        notify: !options?.silent,
-        pmOneSide: options?.pmOneside
-      });
+      await this.client.pinMessage(entity, messageId, { notify });
 
       return {
         success: true
@@ -254,202 +257,30 @@ export class MessageOperations extends BaseTelegramClient {
   }
 
   /**
-   * Get pinned messages
-   */
-  async getPinnedMessages(chatId: string | number): Promise<{ success: boolean; messages?: any[]; error?: string }> {
-    try {
-      await this.ensureConnected();
-
-      const entity = await this.client.getEntity(chatId);
-      const messages = await this.client.getMessages(entity, {
-        filter: new Api.InputMessagesFilterPinned()
-      });
-
-      return {
-        success: true,
-        messages: messages.map(msg => ({
-          id: msg.id,
-          message: msg.message,
-          date: msg.date,
-          fromId: msg.fromId?.toString(),
-          peerId: msg.peerId?.toString(),
-          pinned: msg.pinned
-        }))
-      };
-    } catch (error: any) {
-      console.error('Failed to get pinned messages:', error);
-      return {
-        success: false,
-        error: error.message || 'Failed to get pinned messages'
-      };
-    }
-  }
-
-  /**
-   * Mark messages as read
-   */
-  async markAsRead(chatId: string | number, messageIds?: number[]): Promise<{ success: boolean; error?: string }> {
-    try {
-      await this.ensureConnected();
-
-      const entity = await this.client.getEntity(chatId);
-      await this.client.markAsRead(entity, messageIds);
-
-      return {
-        success: true
-      };
-    } catch (error: any) {
-      console.error('Failed to mark messages as read:', error);
-      return {
-        success: false,
-        error: error.message || 'Failed to mark messages as read'
-      };
-    }
-  }
-
-  /**
    * Send typing indicator
    */
   async sendTyping(chatId: string | number, action: 'typing' | 'cancel' | 'recording' | 'upload_photo' | 'upload_video' | 'upload_audio' | 'upload_document' = 'typing'): Promise<{ success: boolean; error?: string }> {
-    try {
-      await this.ensureConnected();
-
-      const entity = await this.client.getEntity(chatId);
-      
-      let typingAction: any;
-      switch (action) {
-        case 'cancel':
-          typingAction = new Api.SendMessageCancelAction();
-          break;
-        case 'recording':
-          typingAction = new Api.SendMessageRecordAudioAction();
-          break;
-        case 'upload_photo':
-          typingAction = new Api.SendMessageUploadPhotoAction({ progress: 0 });
-          break;
-        case 'upload_video':
-          typingAction = new Api.SendMessageUploadVideoAction({ progress: 0 });
-          break;
-        case 'upload_audio':
-          typingAction = new Api.SendMessageUploadAudioAction({ progress: 0 });
-          break;
-        case 'upload_document':
-          typingAction = new Api.SendMessageUploadDocumentAction({ progress: 0 });
-          break;
-        default:
-          typingAction = new Api.SendMessageTypingAction();
-      }
-
-      await this.client.invoke(new Api.messages.SetTyping({
-        peer: entity,
-        action: typingAction
-      }));
-
-      return {
-        success: true
-      };
-    } catch (error: any) {
-      console.error('Failed to send typing indicator:', error);
-      return {
-        success: false,
-        error: error.message || 'Failed to send typing indicator'
-      };
-    }
+    return this.sendTypingOp.sendTyping(chatId, action);
   }
 
   /**
    * Mark messages as read
    */
   async markAsRead(chatId: string | number, messageIds?: number[]): Promise<{ success: boolean; error?: string }> {
-    try {
-      await this.ensureConnected();
-
-      const entity = await this.client.getEntity(chatId);
-      
-      if (messageIds && messageIds.length > 0) {
-        // Mark specific messages as read
-        await this.client.invoke(new Api.messages.ReadMessageContents({
-          id: messageIds
-        }));
-      } else {
-        // Mark all messages in chat as read
-        await this.client.invoke(new Api.messages.ReadHistory({
-          peer: entity,
-          maxId: 0
-        }));
-      }
-
-      return {
-        success: true
-      };
-    } catch (error: any) {
-      console.error('Failed to mark messages as read:', error);
-      return {
-        success: false,
-        error: error.message || 'Failed to mark messages as read'
-      };
-    }
+    return this.markAsReadOp.markAsRead(chatId, messageIds);
   }
 
   /**
    * Get message reactions
    */
   async getMessageReactions(chatId: string | number, messageId: number): Promise<{ success: boolean; reactions?: any; error?: string }> {
-    try {
-      await this.ensureConnected();
-
-      const entity = await this.client.getEntity(chatId);
-      const reactions = await this.client.invoke(new Api.messages.GetMessageReactionsList({
-        peer: entity,
-        id: messageId,
-        limit: 100
-      }));
-
-      return {
-        success: true,
-        reactions: {
-          count: reactions.count,
-          reactions: reactions.reactions?.map((r: any) => ({
-            reaction: r.reaction,
-            count: r.count,
-            chosen: r.chosen,
-            users: r.users
-          }))
-        }
-      };
-    } catch (error: any) {
-      console.error('Failed to get message reactions:', error);
-      return {
-        success: false,
-        error: error.message || 'Failed to get message reactions'
-      };
-    }
+    return this.getMessageReactionsOp.getMessageReactions(chatId, messageId);
   }
 
   /**
    * Set message reaction
    */
   async setMessageReaction(chatId: string | number, messageId: number, reaction?: string): Promise<{ success: boolean; error?: string }> {
-    try {
-      await this.ensureConnected();
-
-      const entity = await this.client.getEntity(chatId);
-      
-      await this.client.invoke(new Api.messages.SendReaction({
-        peer: entity,
-        msgId: messageId,
-        reaction: reaction ? [new Api.ReactionEmoji({ emoticon: reaction })] : []
-      }));
-
-      return {
-        success: true
-      };
-    } catch (error: any) {
-      console.error('Failed to set message reaction:', error);
-      return {
-        success: false,
-        error: error.message || 'Failed to set message reaction'
-      };
-    }
+    return this.setMessageReactionOp.setMessageReaction(chatId, messageId, reaction);
   }
 }

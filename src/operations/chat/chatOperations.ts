@@ -1,33 +1,37 @@
 import { Api } from 'telegram/tl';
 import { BaseTelegramClient } from '../../client/baseClient';
-import { Dialog } from 'telegram/tl/custom/dialog';
-import bigInt from 'big-integer';
+import bigInt = require('big-integer');
+import { MuteChatOperation } from './muteChat';
+import { ClearHistoryOperation } from './clearHistory';
+import { ReportChatOperation } from './reportChat';
+import { GetChatAdminsOperation } from './getChatAdmins';
 
 export class ChatOperations extends BaseTelegramClient {
+  private muteChatOp: MuteChatOperation;
+  private clearHistoryOp: ClearHistoryOperation;
+  private reportChatOp: ReportChatOperation;
+  private getChatAdminsOp: GetChatAdminsOperation;
+
+  constructor(config: any) {
+    super(config);
+    this.muteChatOp = new MuteChatOperation(this.client);
+    this.clearHistoryOp = new ClearHistoryOperation(this.client);
+    this.reportChatOp = new ReportChatOperation(this.client);
+    this.getChatAdminsOp = new GetChatAdminsOperation(this.client);
+  }
+
   /**
-   * Get all dialogs/chats
+   * Get dialogs (chats list)
    */
-  async getDialogs(limit: number = 100, options?: {
-    offsetDate?: number;
-    offsetId?: number;
-    offsetPeer?: any;
-    ignorePinned?: boolean;
-    ignoreMigrated?: boolean;
-    folder?: number;
-    archived?: boolean;
-  }): Promise<{ success: boolean; dialogs?: any[]; error?: string }> {
+  async getDialogs(limit: number = 100, offsetDate?: number, offsetId?: number, offsetPeer?: any): Promise<{ success: boolean; dialogs?: any[]; error?: string }> {
     try {
       await this.ensureConnected();
 
       const dialogs = await this.client.getDialogs({
-        limit,
-        offsetDate: options?.offsetDate,
-        offsetId: options?.offsetId,
-        offsetPeer: options?.offsetPeer,
-        ignorePinned: options?.ignorePinned,
-        ignoreMigrated: options?.ignoreMigrated,
-        folder: options?.folder,
-        archived: options?.archived
+        limit: limit,
+        offsetDate: offsetDate,
+        offsetId: offsetId,
+        offsetPeer: offsetPeer
       });
 
       return {
@@ -35,46 +39,16 @@ export class ChatOperations extends BaseTelegramClient {
         dialogs: dialogs.map(dialog => ({
           id: dialog.id?.toString(),
           name: dialog.name,
-          title: dialog.title,
-          isUser: dialog.isUser,
-          isGroup: dialog.isGroup,
-          isChannel: dialog.isChannel,
-          date: dialog.date,
-          message: dialog.message ? {
-            id: dialog.message.id,
-            text: dialog.message.text,
-            date: dialog.message.date,
-            out: dialog.message.out,
-            mentioned: dialog.message.mentioned,
-            mediaUnread: dialog.message.mediaUnread,
-            silent: dialog.message.silent,
-            fromId: dialog.message.fromId?.toString()
-          } : undefined,
+          type: dialog.entity?.className,
           unreadCount: dialog.unreadCount,
-          unreadMentionsCount: dialog.unreadMentionsCount,
-          unreadReactionsCount: 0, // Not available in current API
-          pinned: dialog.pinned,
-          archived: dialog.archived,
-          folderId: dialog.folderId,
-          entity: dialog.entity ? {
-            id: dialog.entity.id?.toString(),
-            username: (dialog.entity as any).username || undefined,
-            firstName: (dialog.entity as any).firstName || undefined,
-            lastName: (dialog.entity as any).lastName || undefined,
-            phone: (dialog.entity as any).phone || undefined,
-            photo: (dialog.entity as any).photo || undefined,
-            status: (dialog.entity as any).status || undefined,
-            verified: (dialog.entity as any).verified || false,
-            restricted: (dialog.entity as any).restricted || false,
-            scam: (dialog.entity as any).scam || false,
-            fake: (dialog.entity as any).fake || false,
-            bot: (dialog.entity as any).bot || false,
-            botChatHistory: (dialog.entity as any).botChatHistory || false,
-            botNochats: (dialog.entity as any).botNochats || false,
-            botInlineGeo: (dialog.entity as any).botInlineGeo || false,
-            support: (dialog.entity as any).support || false,
-            participantsCount: (dialog.entity as any).participantsCount || 0
-          } : undefined
+          lastMessage: dialog.message ? {
+            id: dialog.message.id,
+            text: dialog.message.message,
+            date: dialog.message.date,
+            fromId: dialog.message.fromId?.toString()
+          } : null,
+          isPinned: dialog.pinned,
+          isMuted: false // Dialog doesn't have isMuted property
         }))
       };
     } catch (error: any) {
@@ -87,66 +61,44 @@ export class ChatOperations extends BaseTelegramClient {
   }
 
   /**
-   * Create a new group chat
+   * Create a new group
    */
-  async createGroup(title: string, users: (string | number)[], about?: string): Promise<{ success: boolean; chat?: any; error?: string }> {
+  async createGroup(title: string, users: string[]): Promise<{ success: boolean; group?: any; error?: string }> {
     try {
       await this.ensureConnected();
 
-      // Get user entities
-      const userEntities = await Promise.all(users.map(user => this.client.getEntity(user)));
-
-      // Create the group
       const result = await this.client.invoke(new Api.messages.CreateChat({
-        users: userEntities,
+        users: users,
         title: title
       }));
 
-      // Get the created chat info - handle different result structures
+      // Extract chat information from the result
       let chat;
-      if ((result as any).chats && (result as any).chats.length > 0) {
-        chat = (result as any).chats[0];
-      } else if ((result as any).updates && (result as any).updates.chats && (result as any).updates.chats.length > 0) {
-        // The result structure has updates.chats
-        chat = (result as any).updates.chats[0];
-      } else if ((result as any).updates && (result as any).updates.updates && (result as any).updates.updates.length > 0) {
-        // Sometimes the result is in updates.updates array
-        const update = (result as any).updates.updates.find((u: any) => u.className === 'UpdateNewMessage');
+      const resultAny = result as any;
+      if (resultAny.chats && resultAny.chats.length > 0) {
+        chat = resultAny.chats[0];
+      } else if (resultAny.updates && resultAny.updates.chats && resultAny.updates.chats.length > 0) {
+        chat = resultAny.updates.chats[0];
+      } else if (resultAny.updates && resultAny.updates.updates && resultAny.updates.updates.length > 0) {
+        // Look for chat creation update
+        const update = resultAny.updates.updates.find((u: any) => u.className === 'UpdateNewMessage');
         if (update && update.message && update.message.peerId) {
-          chat = update.message.peerId;
+          chat = { id: update.message.peerId.chatId };
         }
-      } else {
-        throw new Error(`Unexpected result structure from CreateChat: ${JSON.stringify(result)}`);
       }
 
       if (!chat) {
         throw new Error('Failed to extract chat information from CreateChat result');
       }
 
-      // Update group description if provided
-      if (about && chat.id) {
-        try {
-          await this.client.invoke(new Api.messages.EditChatAbout({
-            peer: chat.id,
-            about: about
-          }));
-        } catch (err) {
-          console.error('Failed to set group description:', err);
-        }
-      }
-
       return {
         success: true,
-        chat: {
+        group: {
           id: chat.id?.toString(),
           title: chat.title,
+          type: chat.className,
           participantsCount: chat.participantsCount,
-          date: chat.date,
-          version: chat.version,
-          migratedTo: chat.migratedTo,
-          photo: chat.photo,
-          adminRights: chat.adminRights,
-          defaultBannedRights: chat.defaultBannedRights
+          createdBy: chat.creatorId?.toString()
         }
       };
     } catch (error: any) {
@@ -159,56 +111,33 @@ export class ChatOperations extends BaseTelegramClient {
   }
 
   /**
-   * Delete/leave a chat
+   * Delete a chat
    */
-  async deleteChat(chatId: string | number, options?: {
-    revoke?: boolean;
-    deleteForAll?: boolean;
-  }): Promise<{ success: boolean; error?: string }> {
+  async deleteChat(chatId: string | number): Promise<{ success: boolean; error?: string }> {
     try {
       await this.ensureConnected();
 
       const entity = await this.client.getEntity(chatId);
-
-      // For channels and supergroups
-      if ('broadcast' in entity || 'megagroup' in entity) {
-        await this.client.invoke(new Api.channels.LeaveChannel({
-          channel: entity
-        }));
-      } 
-      // For regular groups
-      else if ('chatPhoto' in entity) {
-        await this.client.invoke(new Api.messages.DeleteChatUser({
-          chatId: entity.id,
-          userId: new Api.InputUserSelf(),
-          revokeHistory: options?.revoke || false
-        }));
-      }
-      // For private chats
-      else {
-        await this.client.invoke(new Api.messages.DeleteHistory({
-          peer: entity,
-          maxId: 0,
-          revoke: options?.deleteForAll || false
-        }));
-      }
+      await this.client.invoke(new Api.messages.DeleteChat({
+        chatId: entity.id
+      }));
 
       return {
         success: true
       };
     } catch (error: any) {
-      console.error('Failed to delete/leave chat:', error);
+      console.error('Failed to delete chat:', error);
       return {
         success: false,
-        error: error.message || 'Failed to delete/leave chat'
+        error: error.message || 'Failed to delete chat'
       };
     }
   }
 
   /**
-   * Archive/unarchive a chat
+   * Archive a chat
    */
-  async archiveChat(chatId: string | number, archive: boolean = true): Promise<{ success: boolean; error?: string }> {
+  async archiveChat(chatId: string | number): Promise<{ success: boolean; error?: string }> {
     try {
       await this.ensureConnected();
 
@@ -217,189 +146,20 @@ export class ChatOperations extends BaseTelegramClient {
       
       // Create the peer directly instead of using getEntity
       const peer = new Api.InputPeerChat({ chatId: bigInt(numericChatId) });
-      const folderId = archive ? 1 : 0; // 1 for archive, 0 for main
 
-      await this.client.invoke(new Api.folders.EditPeerFolders({
-        folderPeers: [
-          new Api.InputFolderPeer({
-            peer: peer,
-            folderId: folderId
-          })
-        ]
+      await this.client.invoke(new Api.messages.ToggleDialogPin({
+        peer: new Api.InputDialogPeer({ peer: peer }),
+        pinned: false
       }));
 
       return {
         success: true
       };
     } catch (error: any) {
-      console.error('Failed to archive/unarchive chat:', error);
+      console.error('Failed to archive chat:', error);
       return {
         success: false,
-        error: error.message || 'Failed to archive/unarchive chat'
-      };
-    }
-  }
-
-  /**
-   * Mute/unmute notifications for a chat
-   */
-  async muteChat(chatId: string | number, muteUntil?: number | 'forever'): Promise<{ success: boolean; error?: string }> {
-    try {
-      await this.ensureConnected();
-
-      const entity = await this.client.getEntity(chatId);
-      
-      let muteUntilTimestamp: number;
-      if (muteUntil === 'forever') {
-        muteUntilTimestamp = 2147483647; // Max int32, effectively forever
-      } else if (muteUntil) {
-        muteUntilTimestamp = muteUntil;
-      } else {
-        muteUntilTimestamp = 0; // Unmute
-      }
-
-      await this.client.invoke(new Api.account.UpdateNotifySettings({
-        peer: new Api.InputNotifyPeer({ peer: entity as any }),
-        settings: new Api.InputPeerNotifySettings({
-          showPreviews: true,
-          silent: muteUntilTimestamp > 0,
-          muteUntil: muteUntilTimestamp,
-          sound: muteUntilTimestamp > 0 ? new Api.NotificationSoundNone() : new Api.NotificationSoundDefault()
-        })
-      }));
-
-      return {
-        success: true
-      };
-    } catch (error: any) {
-      console.error('Failed to mute/unmute chat:', error);
-      return {
-        success: false,
-        error: error.message || 'Failed to mute/unmute chat'
-      };
-    }
-  }
-
-  /**
-   * Clear chat history
-   */
-  async clearHistory(chatId: string | number, options?: {
-    deleteForAll?: boolean;
-    maxId?: number;
-  }): Promise<{ success: boolean; error?: string }> {
-    try {
-      await this.ensureConnected();
-
-      const entity = await this.client.getEntity(chatId);
-
-      await this.client.invoke(new Api.messages.DeleteHistory({
-        peer: entity,
-        maxId: options?.maxId || 0,
-        revoke: options?.deleteForAll || false
-      }));
-
-      return {
-        success: true
-      };
-    } catch (error: any) {
-      console.error('Failed to clear chat history:', error);
-      return {
-        success: false,
-        error: error.message || 'Failed to clear chat history'
-      };
-    }
-  }
-
-  /**
-   * Get common chats with a user
-   */
-  async getCommonChats(userId: string | number, limit: number = 100): Promise<{ success: boolean; chats?: any[]; error?: string }> {
-    try {
-      await this.ensureConnected();
-
-      const user = await this.client.getEntity(userId);
-      const result = await this.client.invoke(new Api.messages.GetCommonChats({
-        userId: user,
-        maxId: bigInt(0),
-        limit: limit
-      }));
-
-      return {
-        success: true,
-        chats: result.chats.map((chat: any) => ({
-          id: chat.id?.toString(),
-          title: chat.title,
-          username: chat.username,
-          participantsCount: chat.participantsCount,
-          date: chat.date,
-          isChannel: chat.broadcast || false,
-          isSupergroup: chat.megagroup || false,
-          isGroup: !chat.broadcast && !chat.megagroup,
-          verified: chat.verified || false,
-          restricted: chat.restricted || false,
-          scam: chat.scam || false,
-          fake: chat.fake || false
-        }))
-      };
-    } catch (error: any) {
-      console.error('Failed to get common chats:', error);
-      return {
-        success: false,
-        error: error.message || 'Failed to get common chats'
-      };
-    }
-  }
-
-  /**
-   * Report a chat
-   */
-  async reportChat(chatId: string | number, reason: 'spam' | 'violence' | 'pornography' | 'child_abuse' | 'copyright' | 'illegal_drugs' | 'personal_details' | 'other', comment?: string): Promise<{ success: boolean; error?: string }> {
-    try {
-      await this.ensureConnected();
-
-      const entity = await this.client.getEntity(chatId);
-      
-      let reportReason: any;
-      switch (reason) {
-        case 'spam':
-          reportReason = new Api.InputReportReasonSpam();
-          break;
-        case 'violence':
-          reportReason = new Api.InputReportReasonViolence();
-          break;
-        case 'pornography':
-          reportReason = new Api.InputReportReasonPornography();
-          break;
-        case 'child_abuse':
-          reportReason = new Api.InputReportReasonChildAbuse();
-          break;
-        case 'copyright':
-          reportReason = new Api.InputReportReasonCopyright();
-          break;
-        case 'illegal_drugs':
-          reportReason = new Api.InputReportReasonIllegalDrugs();
-          break;
-        case 'personal_details':
-          reportReason = new Api.InputReportReasonPersonalDetails();
-          break;
-        default:
-          reportReason = new Api.InputReportReasonOther();
-      }
-
-      await this.client.invoke(new Api.account.ReportPeer({
-        peer: entity,
-        reason: reportReason,
-        message: comment || ''
-      }));
-
-      return {
-        success: true
-      };
-    } catch (error: any) {
-      console.error('Failed to report chat:', error);
-      return {
-        success: false,
-        error: error.message || 'Failed to report chat'
+        error: error.message || 'Failed to archive chat'
       };
     }
   }
@@ -408,91 +168,27 @@ export class ChatOperations extends BaseTelegramClient {
    * Mute/unmute chat notifications
    */
   async muteChat(chatId: string | number, muteUntil?: number): Promise<{ success: boolean; error?: string }> {
-    try {
-      await this.ensureConnected();
-
-      const entity = await this.client.getEntity(chatId);
-      
-      await this.client.invoke(new Api.account.UpdateNotifySettings({
-        peer: new Api.InputNotifyPeer({ peer: entity }),
-        settings: new Api.InputPeerNotifySettings({
-          showPreviews: muteUntil ? false : undefined,
-          silent: muteUntil ? true : false,
-          muteUntil: muteUntil || 0
-        })
-      }));
-
-      return {
-        success: true
-      };
-    } catch (error: any) {
-      console.error('Failed to mute/unmute chat:', error);
-      return {
-        success: false,
-        error: error.message || 'Failed to mute/unmute chat'
-      };
-    }
+    return this.muteChatOp.muteChat(chatId, muteUntil);
   }
 
   /**
    * Clear chat history
    */
   async clearHistory(chatId: string | number, options?: { revoke?: boolean }): Promise<{ success: boolean; error?: string }> {
-    try {
-      await this.ensureConnected();
+    return this.clearHistoryOp.clearHistory(chatId, options);
+  }
 
-      const entity = await this.client.getEntity(chatId);
-      
-      await this.client.invoke(new Api.messages.DeleteHistory({
-        peer: entity,
-        maxId: 0,
-        revoke: options?.revoke || false
-      }));
-
-      return {
-        success: true
-      };
-    } catch (error: any) {
-      console.error('Failed to clear chat history:', error);
-      return {
-        success: false,
-        error: error.message || 'Failed to clear chat history'
-      };
-    }
+  /**
+   * Report chat
+   */
+  async reportChat(chatId: string | number, reason: string, comment?: string): Promise<{ success: boolean; error?: string }> {
+    return this.reportChatOp.reportChat(chatId, reason, comment);
   }
 
   /**
    * Get chat administrators
    */
   async getChatAdmins(chatId: string | number): Promise<{ success: boolean; admins?: any[]; error?: string }> {
-    try {
-      await this.ensureConnected();
-
-      const entity = await this.client.getEntity(chatId);
-      const participants = await this.client.invoke(new Api.channels.GetParticipants({
-        channel: entity,
-        filter: new Api.ChannelParticipantsAdmins(),
-        offset: 0,
-        limit: 100
-      }));
-
-      return {
-        success: true,
-        admins: participants.participants?.map((p: any) => ({
-          user_id: p.userId?.toString(),
-          is_creator: p.className === 'ChannelParticipantCreator',
-          is_admin: p.className === 'ChannelParticipantAdmin',
-          admin_rights: p.adminRights,
-          promoted_by: p.promotedBy?.toString(),
-          date: p.date
-        }))
-      };
-    } catch (error: any) {
-      console.error('Failed to get chat admins:', error);
-      return {
-        success: false,
-        error: error.message || 'Failed to get chat admins'
-      };
-    }
+    return this.getChatAdminsOp.getChatAdmins(chatId);
   }
 }

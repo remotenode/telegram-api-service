@@ -1,99 +1,47 @@
 import { Api } from 'telegram/tl';
-import bigInt from 'big-integer';
 import { BaseTelegramClient } from '../../client/baseClient';
-import { ValidateSessionResponse } from '../../types';
+import bigInt = require('big-integer');
+import { GetUserStatusOperation } from './getUserStatus';
+import { SearchUsersOperation } from './searchUsers';
 
 export class UserOperations extends BaseTelegramClient {
-  /**
-   * Validates the current session and retrieves user information
-   */
-  async validateSession(): Promise<ValidateSessionResponse> {
-    try {
-      await this.ensureConnected();
+  private getUserStatusOp: GetUserStatusOperation;
+  private searchUsersOp: SearchUsersOperation;
 
-      // Get current user info
-      const me = await this.client.getMe();
-      
-      // Get full user info for more details
-      const fullUser = await this.client.invoke(new Api.users.GetFullUser({
-        id: new Api.InputUserSelf()
-      }));
-
-      return {
-        success: true,
-        isValid: true,
-        userInfo: {
-          id: me.id?.toString(),
-          username: me.username,
-          first_name: me.firstName,
-          last_name: me.lastName,
-          is_bot: me.bot,
-          is_premium: me.premium,
-          phone: me.phone,
-          about: fullUser.fullUser.about,
-          profile_photo: fullUser.fullUser.profilePhoto && fullUser.fullUser.profilePhoto.className !== 'PhotoEmpty' ? {
-            id: fullUser.fullUser.profilePhoto.id?.toString(),
-            dc_id: (fullUser.fullUser.profilePhoto as any).dcId
-          } : undefined,
-          common_chats_count: fullUser.fullUser.commonChatsCount,
-          blocked: fullUser.fullUser.blocked,
-          can_pin_message: fullUser.fullUser.canPinMessage,
-          has_private_forwards: fullUser.fullUser.privateForwardName !== undefined,
-          settings: fullUser.fullUser.settings ? {
-            report_spam: fullUser.fullUser.settings.reportSpam,
-            add_contact: fullUser.fullUser.settings.addContact,
-            block_contact: fullUser.fullUser.settings.blockContact,
-            share_contact: fullUser.fullUser.settings.shareContact,
-            report_geo: fullUser.fullUser.settings.reportGeo
-          } : undefined
-        }
-      };
-    } catch (error: any) {
-      console.error('Session validation failed:', error);
-      return {
-        success: false,
-        isValid: false,
-        error: error.message || 'Session validation failed'
-      };
-    }
+  constructor(config: any) {
+    super(config);
+    this.getUserStatusOp = new GetUserStatusOperation(this.client);
+    this.searchUsersOp = new SearchUsersOperation(this.client);
   }
 
   /**
-   * Get users by their IDs or usernames
+   * Get user information
    */
-  async getUsers(ids: (string | number)[]): Promise<{ success: boolean; users?: any[]; error?: string }> {
+  async getUsers(userIds: string[]): Promise<{ success: boolean; users?: any[]; error?: string }> {
     try {
       await this.ensureConnected();
 
-      const inputUsers = await Promise.all(ids.map(async (id) => {
-        try {
-          const entity = await this.client.getEntity(id);
-          return entity;
-        } catch (err) {
-          console.error(`Failed to get entity for ${id}:`, err);
-          return null;
-        }
-      }));
-
-      const validUsers = inputUsers.filter(u => u !== null);
+      const users = await this.client.getEntity(userIds);
+      const userArray = Array.isArray(users) ? users : [users];
 
       return {
         success: true,
-        users: validUsers.map(user => ({
-          id: user.id?.toString(),
-          // Only include properties that exist on User entities
-          ...(user.className === 'User' ? {
-            username: (user as any).username,
-            first_name: (user as any).firstName,
-            last_name: (user as any).lastName,
-            is_bot: (user as any).bot,
-            is_premium: (user as any).premium,
-            is_verified: (user as any).verified,
-            is_restricted: (user as any).restricted,
-            is_scam: (user as any).scam,
-            is_fake: (user as any).fake
-          } : {})
-        }))
+        users: userArray.map(user => {
+          const userAny = user as any;
+          return {
+            id: userAny.id?.toString(),
+            username: userAny.username,
+            first_name: userAny.firstName,
+            last_name: userAny.lastName,
+            is_bot: userAny.bot,
+            is_premium: userAny.premium,
+            phone: userAny.phone,
+            about: userAny.about,
+            profile_photo: userAny.photo,
+            common_chats_count: userAny.commonChatsCount,
+            blocked: userAny.blocked
+          };
+        })
       };
     } catch (error: any) {
       console.error('Failed to get users:', error);
@@ -105,34 +53,67 @@ export class UserOperations extends BaseTelegramClient {
   }
 
   /**
-   * Get user profile photos
+   * Update user profile
    */
-  async getUserPhotos(userId: string | number, limit: number = 10): Promise<{ success: boolean; photos?: any[]; error?: string }> {
+  async updateProfile(options: {
+    firstName?: string;
+    lastName?: string;
+    about?: string;
+  }): Promise<{ success: boolean; user?: any; error?: string }> {
+    try {
+      await this.ensureConnected();
+
+      const result = await this.client.invoke(new Api.account.UpdateProfile({
+        firstName: options.firstName,
+        lastName: options.lastName,
+        about: options.about
+      }));
+
+      return {
+        success: true,
+        user: {
+          id: result.id?.toString(),
+          username: (result as any).username,
+          first_name: (result as any).firstName,
+          last_name: (result as any).lastName,
+          is_bot: (result as any).bot,
+          is_premium: (result as any).premium,
+          phone: (result as any).phone,
+          about: (result as any).about,
+          profile_photo: (result as any).photo
+        }
+      };
+    } catch (error: any) {
+      console.error('Failed to update profile:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to update profile'
+      };
+    }
+  }
+
+  /**
+   * Get user photos
+   */
+  async getUserPhotos(userId: string | number, limit: number = 20, offset: number = 0): Promise<{ success: boolean; photos?: any[]; error?: string }> {
     try {
       await this.ensureConnected();
 
       const user = await this.client.getEntity(userId);
       const photos = await this.client.invoke(new Api.photos.GetUserPhotos({
         userId: user,
-        offset: 0,
+        offset: offset,
         maxId: bigInt(0),
         limit: limit
       }));
 
       return {
         success: true,
-        photos: photos.photos.map(photo => ({
+        photos: photos.photos?.map((photo: any) => ({
           id: photo.id?.toString(),
-          // Only include properties that exist on Photo entities
-          ...(photo.className === 'Photo' ? {
-            date: (photo as any).date,
-            sizes: (photo as any).sizes?.map((size: any) => ({
-              type: size.type,
-              width: size.w,
-              height: size.h,
-              size: size.size
-            }))
-          } : {})
+          date: photo.date,
+          sizes: photo.sizes,
+          dc_id: photo.dcId
         }))
       };
     } catch (error: any) {
@@ -145,81 +126,112 @@ export class UserOperations extends BaseTelegramClient {
   }
 
   /**
-   * Update profile information
+   * Get common chats with a user
    */
-  async updateProfile(updates: {
-    firstName?: string;
-    lastName?: string;
-    about?: string;
-  }): Promise<{ success: boolean; error?: string }> {
+  async getCommonChats(userId: string | number, maxId: number = 0, limit: number = 100): Promise<{ success: boolean; chats?: any[]; error?: string }> {
     try {
       await this.ensureConnected();
 
-      const promises: Promise<any>[] = [];
-
-      // Update name if provided
-      if (updates.firstName !== undefined || updates.lastName !== undefined) {
-        promises.push(
-          this.client.invoke(new Api.account.UpdateProfile({
-            firstName: updates.firstName,
-            lastName: updates.lastName
-          }))
-        );
-      }
-
-      // Update about/bio if provided
-      if (updates.about !== undefined) {
-        promises.push(
-          this.client.invoke(new Api.account.UpdateProfile({
-            about: updates.about
-          }))
-        );
-      }
-
-      await Promise.all(promises);
+      const user = await this.client.getEntity(userId);
+      const result = await this.client.invoke(new Api.messages.GetCommonChats({
+        userId: user,
+        maxId: bigInt(maxId),
+        limit: limit
+      }));
 
       return {
-        success: true
+        success: true,
+        chats: result.chats?.map((chat: any) => ({
+          id: chat.id?.toString(),
+          title: chat.title,
+          type: chat.className,
+          participants_count: chat.participantsCount,
+          created_by: chat.creatorId?.toString()
+        }))
       };
     } catch (error: any) {
-      console.error('Failed to update profile:', error);
+      console.error('Failed to get common chats:', error);
       return {
         success: false,
-        error: error.message || 'Failed to update profile'
+        error: error.message || 'Failed to get common chats'
       };
     }
   }
 
   /**
-   * Get current user's blocked users
+   * Block a user
    */
-  async getBlockedUsers(limit: number = 100): Promise<{ success: boolean; blockedUsers?: any[]; error?: string }> {
+  async blockUser(userId: string | number): Promise<{ success: boolean; error?: string }> {
     try {
       await this.ensureConnected();
 
-      const blocked = await this.client.invoke(new Api.contacts.GetBlocked({
-        offset: 0,
+      const user = await this.client.getEntity(userId);
+      await this.client.invoke(new Api.contacts.Block({
+        id: user
+      }));
+
+      return {
+        success: true
+      };
+    } catch (error: any) {
+      console.error('Failed to block user:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to block user'
+      };
+    }
+  }
+
+  /**
+   * Unblock a user
+   */
+  async unblockUser(userId: string | number): Promise<{ success: boolean; error?: string }> {
+    try {
+      await this.ensureConnected();
+
+      const user = await this.client.getEntity(userId);
+      await this.client.invoke(new Api.contacts.Unblock({
+        id: user
+      }));
+
+      return {
+        success: true
+      };
+    } catch (error: any) {
+      console.error('Failed to unblock user:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to unblock user'
+      };
+    }
+  }
+
+  /**
+   * Get blocked users
+   */
+  async getBlockedUsers(offset: number = 0, limit: number = 100): Promise<{ success: boolean; users?: any[]; error?: string }> {
+    try {
+      await this.ensureConnected();
+
+      const result = await this.client.invoke(new Api.contacts.GetBlocked({
+        offset: offset,
         limit: limit
       }));
 
-      const users = 'users' in blocked ? blocked.users : [];
-      const blockedList = 'blocked' in blocked ? blocked.blocked : [];
-
       return {
         success: true,
-        blockedUsers: blockedList.map((blockedUser: any, index: number) => {
-          const user = users[index];
-          return {
-            id: user?.id?.toString(),
-            // Only include properties that exist on User entities
-            ...(user?.className === 'User' ? {
-              username: (user as any).username,
-              first_name: (user as any).firstName,
-              last_name: (user as any).lastName
-            } : {}),
-            date: blockedUser.date
-          };
-        })
+        users: result.users?.map((user: any) => ({
+          id: user.id?.toString(),
+          username: user.username,
+          first_name: user.firstName,
+          last_name: user.lastName,
+          is_bot: user.bot,
+          is_premium: user.premium,
+          phone: user.phone,
+          about: user.about,
+          profile_photo: user.photo,
+          blocked: user.blocked
+        }))
       };
     } catch (error: any) {
       console.error('Failed to get blocked users:', error);
@@ -231,70 +243,47 @@ export class UserOperations extends BaseTelegramClient {
   }
 
   /**
-   * Get user online status
+   * Validate session
    */
-  async getUserStatus(userId: string | number): Promise<{ success: boolean; status?: any; error?: string }> {
+  async validateSession(): Promise<{ success: boolean; user?: any; error?: string }> {
     try {
       await this.ensureConnected();
 
-      const user = await this.client.getEntity(userId);
-      const fullUser = await this.client.invoke(new Api.users.GetFullUser({
-        id: user
-      }));
-
+      const me = await this.client.getMe();
       return {
         success: true,
-        status: {
-          user_id: userId,
-          status: fullUser.fullUser.status?.className,
-          was_online: fullUser.fullUser.status?.wasOnline,
-          expires: fullUser.fullUser.status?.expires,
-          last_seen: fullUser.fullUser.status?.lastSeen
+        user: {
+          id: me.id?.toString(),
+          username: me.username,
+          first_name: me.firstName,
+          last_name: me.lastName,
+          is_bot: me.bot,
+          is_premium: me.premium,
+          phone: me.phone,
+          about: (me as any).about,
+          profile_photo: me.photo
         }
       };
     } catch (error: any) {
-      console.error('Failed to get user status:', error);
+      console.error('Failed to validate session:', error);
       return {
         success: false,
-        error: error.message || 'Failed to get user status'
+        error: error.message || 'Failed to validate session'
       };
     }
+  }
+
+  /**
+   * Get user online status
+   */
+  async getUserStatus(userId: string | number): Promise<{ success: boolean; status?: any; error?: string }> {
+    return this.getUserStatusOp.getUserStatus(userId);
   }
 
   /**
    * Search for users
    */
   async searchUsers(query: string, limit: number = 20): Promise<{ success: boolean; users?: any[]; error?: string }> {
-    try {
-      await this.ensureConnected();
-
-      const results = await this.client.invoke(new Api.contacts.Search({
-        q: query,
-        limit: limit
-      }));
-
-      return {
-        success: true,
-        users: results.users?.map((user: any) => ({
-          id: user.id?.toString(),
-          username: user.username,
-          first_name: user.firstName,
-          last_name: user.lastName,
-          is_bot: user.bot,
-          is_premium: user.premium,
-          phone: user.phone,
-          about: user.about,
-          profile_photo: user.photo,
-          common_chats_count: user.commonChatsCount,
-          blocked: user.blocked
-        }))
-      };
-    } catch (error: any) {
-      console.error('Failed to search users:', error);
-      return {
-        success: false,
-        error: error.message || 'Failed to search users'
-      };
-    }
+    return this.searchUsersOp.searchUsers(query, limit);
   }
 }
