@@ -3,7 +3,7 @@
   "info": {
     "title": "Telegram API Service",
     "description": "A comprehensive Telegram API service built with TypeScript and the telegram (gramjs) library for real MTProto integration. Provides access to all major Telegram operations including messaging, media, payments, channels, and user management. All endpoints use header-based authentication for security. Accepts credentials from any Telegram account type.",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "contact": {
       "name": "API Support",
       "email": "support@example.com"
@@ -75,6 +75,872 @@
           "X-User-Id": {
             "type": "string",
             "description": "Telegram user ID"
+          }
+        }
+      },
+      "ValidateSessionResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the operation was successful"
+          },
+          "isValid": {
+            "type": "boolean",
+            "description": "Whether the session is valid"
+          },
+          "userInfo": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "User ID"
+              },
+              "username": {
+                "type": "string",
+                "description": "Username (without @)"
+              },
+              "first_name": {
+                "type": "string",
+                "description": "First name"
+              },
+              "last_name": {
+                "type": "string",
+                "description": "Last name"
+              },
+              "is_bot": {
+                "type": "boolean",
+                "description": "Whether the user is a bot"
+              },
+              "is_premium": {
+                "type": "boolean",
+                "description": "Whether the user has Telegram Premium"
+              },
+              "phone": {
+                "type": "string",
+                "description": "Phone number"
+              },
+              "about": {
+                "type": "string",
+                "description": "Bio/about text"
+              },
+              "profile_photo": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "Photo ID"
+                  },
+                  "dc_id": {
+                    "type": "number",
+                    "description": "Data center ID"
+                  }
+                }
+              },
+              "common_chats_count": {
+                "type": "number",
+                "description": "Number of common chats"
+              },
+              "blocked": {
+                "type": "boolean",
+                "description": "Whether the user is blocked"
+              },
+              "can_pin_message": {
+                "type": "boolean",
+                "description": "Whether the user can pin messages"
+              },
+              "has_private_forwards": {
+                "type": "boolean",
+                "description": "Whether the user has private forwards enabled"
+              },
+              "settings": {
+                "type": "object",
+                "properties": {
+                  "report_spam": {
+                    "type": "boolean"
+                  },
+                  "add_contact": {
+                    "type": "boolean"
+                  },
+                  "block_contact": {
+                    "type": "boolean"
+                  },
+                  "share_contact": {
+                    "type": "boolean"
+                  },
+                  "report_geo": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if operation failed"
+          }
+        },
+        "example": {
+          "success": true,
+          "isValid": true,
+          "userInfo": {
+            "id": "123456789",
+            "username": "example_user",
+            "first_name": "John",
+            "last_name": "Doe",
+            "is_bot": false,
+            "is_premium": true,
+            "phone": "+1234567890",
+            "about": "Software developer",
+            "profile_photo": {
+              "id": "1234567890123456789",
+              "dc_id": 2
+            },
+            "common_chats_count": 5,
+            "blocked": false,
+            "can_pin_message": true,
+            "has_private_forwards": false,
+            "settings": {
+              "report_spam": true,
+              "add_contact": true,
+              "block_contact": true,
+              "share_contact": false,
+              "report_geo": false
+            }
+          }
+        }
+      },
+      "GetUsersResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "users": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "username": {
+                  "type": "string"
+                },
+                "first_name": {
+                  "type": "string"
+                },
+                "last_name": {
+                  "type": "string"
+                },
+                "is_bot": {
+                  "type": "boolean"
+                },
+                "is_premium": {
+                  "type": "boolean"
+                },
+                "phone": {
+                  "type": "string"
+                },
+                "about": {
+                  "type": "string"
+                },
+                "profile_photo": {
+                  "type": "object"
+                },
+                "common_chats_count": {
+                  "type": "number"
+                },
+                "blocked": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateProfileResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "username": {
+                "type": "string"
+              },
+              "first_name": {
+                "type": "string"
+              },
+              "last_name": {
+                "type": "string"
+              },
+              "about": {
+                "type": "string"
+              }
+            }
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "SendMessageResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "text": {
+                "type": "string"
+              },
+              "date": {
+                "type": "number"
+              },
+              "from_id": {
+                "type": "string"
+              },
+              "peer_id": {
+                "type": "string"
+              },
+              "reply_to": {
+                "type": "object"
+              },
+              "entities": {
+                "type": "array"
+              }
+            }
+          },
+          "error": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "success": true,
+          "message": {
+            "id": 12345,
+            "text": "Hello, world!",
+            "date": 1640995200,
+            "from_id": "123456789",
+            "peer_id": "987654321",
+            "reply_to": null,
+            "entities": []
+          }
+        }
+      },
+      "GetMessagesResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "date": {
+                  "type": "number"
+                },
+                "from_id": {
+                  "type": "string"
+                },
+                "peer_id": {
+                  "type": "string"
+                },
+                "reply_to": {
+                  "type": "object"
+                },
+                "entities": {
+                  "type": "array"
+                },
+                "media": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "total_count": {
+            "type": "number"
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "EditMessageResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "text": {
+                "type": "string"
+              },
+              "date": {
+                "type": "number"
+              },
+              "edit_date": {
+                "type": "number"
+              },
+              "from_id": {
+                "type": "string"
+              },
+              "peer_id": {
+                "type": "string"
+              }
+            }
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "SearchChannelsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "channels": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "username": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "participants_count": {
+                  "type": "number"
+                },
+                "is_verified": {
+                  "type": "boolean"
+                },
+                "is_scam": {
+                  "type": "boolean"
+                },
+                "is_fake": {
+                  "type": "boolean"
+                },
+                "photo": {
+                  "type": "object"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "channel",
+                    "supergroup",
+                    "group"
+                  ]
+                }
+              }
+            }
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "GetChannelInfoResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "channel": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "username": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "participants_count": {
+                "type": "number"
+              },
+              "is_verified": {
+                "type": "boolean"
+              },
+              "is_scam": {
+                "type": "boolean"
+              },
+              "is_fake": {
+                "type": "boolean"
+              },
+              "photo": {
+                "type": "object"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "channel",
+                  "supergroup",
+                  "group"
+                ]
+              },
+              "date": {
+                "type": "number"
+              },
+              "version": {
+                "type": "number"
+              },
+              "admin_rights": {
+                "type": "object"
+              },
+              "default_banned_rights": {
+                "type": "object"
+              }
+            }
+          },
+          "error": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "success": true,
+          "channel": {
+            "id": "1234567890",
+            "title": "Example Channel",
+            "username": "example_channel",
+            "description": "This is an example channel",
+            "participants_count": 1500,
+            "is_verified": true,
+            "is_scam": false,
+            "is_fake": false,
+            "photo": {
+              "id": "1234567890123456789",
+              "dc_id": 2
+            },
+            "type": "channel",
+            "date": 1640995200,
+            "version": 1,
+            "admin_rights": null,
+            "default_banned_rights": {
+              "view_messages": false,
+              "send_messages": true,
+              "send_media": true,
+              "send_stickers": true,
+              "send_gifs": true,
+              "send_games": true,
+              "send_inline": true,
+              "embed_links": true,
+              "send_polls": true,
+              "change_info": false,
+              "invite_users": false,
+              "pin_messages": false
+            }
+          }
+        }
+      },
+      "GetSimilarChannelsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "channels": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "username": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "participants_count": {
+                  "type": "number"
+                },
+                "is_verified": {
+                  "type": "boolean"
+                },
+                "is_scam": {
+                  "type": "boolean"
+                },
+                "is_fake": {
+                  "type": "boolean"
+                },
+                "photo": {
+                  "type": "object"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "channel",
+                    "supergroup",
+                    "group"
+                  ]
+                }
+              }
+            }
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "GetDialogsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "dialogs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "username": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "user",
+                    "chat",
+                    "channel",
+                    "supergroup"
+                  ]
+                },
+                "participants_count": {
+                  "type": "number"
+                },
+                "unread_count": {
+                  "type": "number"
+                },
+                "last_message": {
+                  "type": "object"
+                },
+                "photo": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateGroupResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "chat": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "participants_count": {
+                "type": "number"
+              },
+              "date": {
+                "type": "number"
+              },
+              "version": {
+                "type": "number"
+              },
+              "migrated_to": {
+                "type": "object"
+              },
+              "photo": {
+                "type": "object"
+              },
+              "admin_rights": {
+                "type": "object"
+              },
+              "default_banned_rights": {
+                "type": "object"
+              }
+            }
+          },
+          "error": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "success": true,
+          "chat": {
+            "id": "1234567890",
+            "title": "Test Group",
+            "participants_count": 2,
+            "date": 1640995200,
+            "version": 1,
+            "migrated_to": null,
+            "photo": {
+              "className": "ChatPhotoEmpty"
+            },
+            "admin_rights": null,
+            "default_banned_rights": {
+              "view_messages": false,
+              "send_messages": true,
+              "send_media": true,
+              "send_stickers": true,
+              "send_gifs": true,
+              "send_games": true,
+              "send_inline": true,
+              "embed_links": true,
+              "send_polls": true,
+              "change_info": false,
+              "invite_users": false,
+              "pin_messages": false
+            }
+          }
+        }
+      },
+      "ArchiveChatResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "SendPhotoResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "text": {
+                "type": "string"
+              },
+              "date": {
+                "type": "number"
+              },
+              "from_id": {
+                "type": "string"
+              },
+              "peer_id": {
+                "type": "string"
+              },
+              "media": {
+                "type": "object",
+                "properties": {
+                  "photo": {
+                    "type": "object"
+                  },
+                  "caption": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "SendDocumentResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "text": {
+                "type": "string"
+              },
+              "date": {
+                "type": "number"
+              },
+              "from_id": {
+                "type": "string"
+              },
+              "peer_id": {
+                "type": "string"
+              },
+              "media": {
+                "type": "object",
+                "properties": {
+                  "document": {
+                    "type": "object"
+                  },
+                  "caption": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "DownloadMediaResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "file": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "size": {
+                "type": "number"
+              },
+              "mime_type": {
+                "type": "string"
+              },
+              "data": {
+                "type": "string",
+                "description": "Base64 encoded file data"
+              }
+            }
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "GetPaymentFormResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "form": {
+            "type": "object",
+            "properties": {
+              "form_id": {
+                "type": "string"
+              },
+              "invoice": {
+                "type": "object"
+              },
+              "can_save_credentials": {
+                "type": "boolean"
+              },
+              "password_missing": {
+                "type": "boolean"
+              },
+              "provider_id": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "native_provider": {
+                "type": "string"
+              },
+              "native_params": {
+                "type": "object"
+              }
+            }
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "CheckGiftCodeResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "gift_code": {
+            "type": "object",
+            "properties": {
+              "slug": {
+                "type": "string"
+              },
+              "from_id": {
+                "type": "string"
+              },
+              "to_id": {
+                "type": "string"
+              },
+              "used_date": {
+                "type": "number"
+              },
+              "gift": {
+                "type": "object"
+              }
+            }
+          },
+          "error": {
+            "type": "string"
           }
         }
       }
@@ -293,15 +1159,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponse"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {}
-                    }
-                  ]
+                  "$ref": "#/components/schemas/GetUsersResponse"
                 }
               }
             }
@@ -660,15 +1518,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponse"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {}
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UpdateProfileResponse"
                 }
               }
             }
@@ -787,15 +1637,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponse"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {}
-                    }
-                  ]
+                  "$ref": "#/components/schemas/GetSimilarChannelsResponse"
                 }
               }
             }
@@ -909,15 +1751,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponse"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {}
-                    }
-                  ]
+                  "$ref": "#/components/schemas/GetChannelInfoResponse"
                 }
               }
             }
@@ -1175,15 +2009,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponse"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {}
-                    }
-                  ]
+                  "$ref": "#/components/schemas/SearchChannelsResponse"
                 }
               }
             }
@@ -1543,15 +2369,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponse"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {}
-                    }
-                  ]
+                  "$ref": "#/components/schemas/GetDialogsResponse"
                 }
               }
             }
@@ -1677,15 +2495,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponse"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {}
-                    }
-                  ]
+                  "$ref": "#/components/schemas/CreateGroupResponse"
                 }
               }
             }
@@ -1804,15 +2614,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponse"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {}
-                    }
-                  ]
+                  "$ref": "#/components/schemas/ArchiveChatResponse"
                 }
               }
             }
@@ -2352,15 +3154,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponse"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {}
-                    }
-                  ]
+                  "$ref": "#/components/schemas/SendMessageResponse"
                 }
               }
             }
@@ -3296,15 +4090,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/ApiResponse"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {}
-                    }
-                  ]
+                  "$ref": "#/components/schemas/DownloadMediaResponse"
                 }
               }
             }
