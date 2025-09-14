@@ -390,4 +390,177 @@ export class MediaOperations extends BaseTelegramClient {
       };
     }
   }
+
+  /**
+   * Send video file
+   */
+  async sendVideo(chatId: string | number, video: Buffer | string, options?: {
+    caption?: string;
+    duration?: number;
+    width?: number;
+    height?: number;
+    thumb?: Buffer | string;
+    replyTo?: number;
+    silent?: boolean;
+  }): Promise<{ success: boolean; message?: any; error?: string }> {
+    try {
+      await this.ensureConnected();
+
+      const entity = await this.client.getEntity(chatId);
+      const sentMessage = await this.client.sendFile(entity, {
+        file: video,
+        caption: options?.caption,
+        duration: options?.duration,
+        width: options?.width,
+        height: options?.height,
+        thumb: options?.thumb,
+        replyTo: options?.replyTo,
+        silent: options?.silent
+      });
+
+      return {
+        success: true,
+        message: {
+          id: sentMessage.id,
+          text: sentMessage.message,
+          date: sentMessage.date,
+          fromId: sentMessage.fromId?.toString(),
+          peerId: sentMessage.peerId?.toString(),
+          media: sentMessage.media
+        }
+      };
+    } catch (error: any) {
+      console.error('Failed to send video:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to send video'
+      };
+    }
+  }
+
+  /**
+   * Send voice message
+   */
+  async sendVoice(chatId: string | number, voice: Buffer | string, options?: {
+    duration?: number;
+    waveform?: Buffer;
+    replyTo?: number;
+    silent?: boolean;
+  }): Promise<{ success: boolean; message?: any; error?: string }> {
+    try {
+      await this.ensureConnected();
+
+      const entity = await this.client.getEntity(chatId);
+      const sentMessage = await this.client.sendFile(entity, {
+        file: voice,
+        duration: options?.duration,
+        waveform: options?.waveform,
+        replyTo: options?.replyTo,
+        silent: options?.silent,
+        voiceNote: true
+      });
+
+      return {
+        success: true,
+        message: {
+          id: sentMessage.id,
+          text: sentMessage.message,
+          date: sentMessage.date,
+          fromId: sentMessage.fromId?.toString(),
+          peerId: sentMessage.peerId?.toString(),
+          media: sentMessage.media
+        }
+      };
+    } catch (error: any) {
+      console.error('Failed to send voice:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to send voice'
+      };
+    }
+  }
+
+  /**
+   * Send media album
+   */
+  async sendAlbum(chatId: string | number, files: (Buffer | string)[], options?: {
+    captions?: string[];
+    replyTo?: number;
+    silent?: boolean;
+  }): Promise<{ success: boolean; messages?: any[]; error?: string }> {
+    try {
+      await this.ensureConnected();
+
+      const entity = await this.client.getEntity(chatId);
+      const sentMessages = await this.client.sendFile(entity, {
+        file: files,
+        caption: options?.captions,
+        replyTo: options?.replyTo,
+        silent: options?.silent
+      });
+
+      return {
+        success: true,
+        messages: Array.isArray(sentMessages) ? sentMessages.map(msg => ({
+          id: msg.id,
+          text: msg.message,
+          date: msg.date,
+          fromId: msg.fromId?.toString(),
+          peerId: msg.peerId?.toString(),
+          media: msg.media
+        })) : [{
+          id: sentMessages.id,
+          text: sentMessages.message,
+          date: sentMessages.date,
+          fromId: sentMessages.fromId?.toString(),
+          peerId: sentMessages.peerId?.toString(),
+          media: sentMessages.media
+        }]
+      };
+    } catch (error: any) {
+      console.error('Failed to send album:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to send album'
+      };
+    }
+  }
+
+  /**
+   * Send sticker
+   */
+  async sendSticker(chatId: string | number, sticker: Buffer | string, options?: {
+    replyTo?: number;
+    silent?: boolean;
+  }): Promise<{ success: boolean; message?: any; error?: string }> {
+    try {
+      await this.ensureConnected();
+
+      const entity = await this.client.getEntity(chatId);
+      const sentMessage = await this.client.sendFile(entity, {
+        file: sticker,
+        replyTo: options?.replyTo,
+        silent: options?.silent,
+        sticker: true
+      });
+
+      return {
+        success: true,
+        message: {
+          id: sentMessage.id,
+          text: sentMessage.message,
+          date: sentMessage.date,
+          fromId: sentMessage.fromId?.toString(),
+          peerId: sentMessage.peerId?.toString(),
+          media: sentMessage.media
+        }
+      };
+    } catch (error: any) {
+      console.error('Failed to send sticker:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to send sticker'
+      };
+    }
+  }
 }

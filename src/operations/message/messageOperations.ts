@@ -356,4 +356,100 @@ export class MessageOperations extends BaseTelegramClient {
       };
     }
   }
+
+  /**
+   * Mark messages as read
+   */
+  async markAsRead(chatId: string | number, messageIds?: number[]): Promise<{ success: boolean; error?: string }> {
+    try {
+      await this.ensureConnected();
+
+      const entity = await this.client.getEntity(chatId);
+      
+      if (messageIds && messageIds.length > 0) {
+        // Mark specific messages as read
+        await this.client.invoke(new Api.messages.ReadMessageContents({
+          id: messageIds
+        }));
+      } else {
+        // Mark all messages in chat as read
+        await this.client.invoke(new Api.messages.ReadHistory({
+          peer: entity,
+          maxId: 0
+        }));
+      }
+
+      return {
+        success: true
+      };
+    } catch (error: any) {
+      console.error('Failed to mark messages as read:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to mark messages as read'
+      };
+    }
+  }
+
+  /**
+   * Get message reactions
+   */
+  async getMessageReactions(chatId: string | number, messageId: number): Promise<{ success: boolean; reactions?: any; error?: string }> {
+    try {
+      await this.ensureConnected();
+
+      const entity = await this.client.getEntity(chatId);
+      const reactions = await this.client.invoke(new Api.messages.GetMessageReactionsList({
+        peer: entity,
+        id: messageId,
+        limit: 100
+      }));
+
+      return {
+        success: true,
+        reactions: {
+          count: reactions.count,
+          reactions: reactions.reactions?.map((r: any) => ({
+            reaction: r.reaction,
+            count: r.count,
+            chosen: r.chosen,
+            users: r.users
+          }))
+        }
+      };
+    } catch (error: any) {
+      console.error('Failed to get message reactions:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to get message reactions'
+      };
+    }
+  }
+
+  /**
+   * Set message reaction
+   */
+  async setMessageReaction(chatId: string | number, messageId: number, reaction?: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      await this.ensureConnected();
+
+      const entity = await this.client.getEntity(chatId);
+      
+      await this.client.invoke(new Api.messages.SendReaction({
+        peer: entity,
+        msgId: messageId,
+        reaction: reaction ? [new Api.ReactionEmoji({ emoticon: reaction })] : []
+      }));
+
+      return {
+        success: true
+      };
+    } catch (error: any) {
+      console.error('Failed to set message reaction:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to set message reaction'
+      };
+    }
+  }
 }

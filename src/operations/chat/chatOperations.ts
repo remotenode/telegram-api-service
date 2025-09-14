@@ -403,4 +403,96 @@ export class ChatOperations extends BaseTelegramClient {
       };
     }
   }
+
+  /**
+   * Mute/unmute chat notifications
+   */
+  async muteChat(chatId: string | number, muteUntil?: number): Promise<{ success: boolean; error?: string }> {
+    try {
+      await this.ensureConnected();
+
+      const entity = await this.client.getEntity(chatId);
+      
+      await this.client.invoke(new Api.account.UpdateNotifySettings({
+        peer: new Api.InputNotifyPeer({ peer: entity }),
+        settings: new Api.InputPeerNotifySettings({
+          showPreviews: muteUntil ? false : undefined,
+          silent: muteUntil ? true : false,
+          muteUntil: muteUntil || 0
+        })
+      }));
+
+      return {
+        success: true
+      };
+    } catch (error: any) {
+      console.error('Failed to mute/unmute chat:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to mute/unmute chat'
+      };
+    }
+  }
+
+  /**
+   * Clear chat history
+   */
+  async clearHistory(chatId: string | number, options?: { revoke?: boolean }): Promise<{ success: boolean; error?: string }> {
+    try {
+      await this.ensureConnected();
+
+      const entity = await this.client.getEntity(chatId);
+      
+      await this.client.invoke(new Api.messages.DeleteHistory({
+        peer: entity,
+        maxId: 0,
+        revoke: options?.revoke || false
+      }));
+
+      return {
+        success: true
+      };
+    } catch (error: any) {
+      console.error('Failed to clear chat history:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to clear chat history'
+      };
+    }
+  }
+
+  /**
+   * Get chat administrators
+   */
+  async getChatAdmins(chatId: string | number): Promise<{ success: boolean; admins?: any[]; error?: string }> {
+    try {
+      await this.ensureConnected();
+
+      const entity = await this.client.getEntity(chatId);
+      const participants = await this.client.invoke(new Api.channels.GetParticipants({
+        channel: entity,
+        filter: new Api.ChannelParticipantsAdmins(),
+        offset: 0,
+        limit: 100
+      }));
+
+      return {
+        success: true,
+        admins: participants.participants?.map((p: any) => ({
+          user_id: p.userId?.toString(),
+          is_creator: p.className === 'ChannelParticipantCreator',
+          is_admin: p.className === 'ChannelParticipantAdmin',
+          admin_rights: p.adminRights,
+          promoted_by: p.promotedBy?.toString(),
+          date: p.date
+        }))
+      };
+    } catch (error: any) {
+      console.error('Failed to get chat admins:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to get chat admins'
+      };
+    }
+  }
 }
