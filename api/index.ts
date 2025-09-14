@@ -218,7 +218,6 @@ export default function handler(
         <p>All endpoints require Telegram API credentials in the request headers for security:</p>
         <div class="endpoint">
           <code>Headers:
-X-Account-Type: pull
 X-Api-Id: 12345
 X-Api-Hash: your-api-hash
 X-Session-String: your-session-string

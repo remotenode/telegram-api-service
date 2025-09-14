@@ -6,7 +6,6 @@ export interface TelegramCredentials {
   apiHash: string;
   sessionString: string;
   userId: string;
-  accountType?: string;
 }
 
 export interface ApiHandlerOptions {
@@ -19,14 +18,12 @@ export interface ApiHandlerOptions {
  * Extract Telegram credentials from request headers
  */
 export function extractCredentials(req: VercelRequest): TelegramCredentials {
-  const accountType = req.headers['x-account-type'] as string || 'pull';
   const apiId = req.headers['x-api-id'] as string;
   const apiHash = req.headers['x-api-hash'] as string;
   const sessionString = req.headers['x-session-string'] as string;
   const userId = req.headers['x-user-id'] as string;
 
   return {
-    accountType,
     apiId: parseInt(apiId),
     apiHash,
     sessionString,

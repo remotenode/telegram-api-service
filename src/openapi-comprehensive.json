@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Telegram API Service",
-    "description": "A comprehensive Telegram API service built with TypeScript and the telegram (gramjs) library for real MTProto integration. Provides access to all major Telegram operations including messaging, media, payments, channels, and user management. All endpoints use header-based authentication for security.",
+    "description": "A comprehensive Telegram API service built with TypeScript and the telegram (gramjs) library for real MTProto integration. Provides access to all major Telegram operations including messaging, media, payments, channels, and user management. All endpoints use header-based authentication for security. Accepts credentials from any Telegram account type.",
     "version": "2.0.0",
     "contact": {
       "name": "API Support",
@@ -135,20 +135,6 @@
         ],
         "parameters": [
           {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
-          {
             "name": "X-Api-Id",
             "in": "header",
             "required": true,
@@ -262,20 +248,6 @@
           }
         ],
         "parameters": [
-          {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
           {
             "name": "X-Api-Id",
             "in": "header",
@@ -401,20 +373,6 @@
           }
         ],
         "parameters": [
-          {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
           {
             "name": "X-Api-Id",
             "in": "header",
@@ -543,20 +501,6 @@
         ],
         "parameters": [
           {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
-          {
             "name": "X-Api-Id",
             "in": "header",
             "required": true,
@@ -676,20 +620,6 @@
           }
         ],
         "parameters": [
-          {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
           {
             "name": "X-Api-Id",
             "in": "header",
@@ -818,20 +748,6 @@
         ],
         "parameters": [
           {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
-          {
             "name": "X-Api-Id",
             "in": "header",
             "required": true,
@@ -959,20 +875,6 @@
         ],
         "parameters": [
           {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
-          {
             "name": "X-Api-Id",
             "in": "header",
             "required": true,
@@ -1094,20 +996,6 @@
           }
         ],
         "parameters": [
-          {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
           {
             "name": "X-Api-Id",
             "in": "header",
@@ -1248,20 +1136,6 @@
         ],
         "parameters": [
           {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
-          {
             "name": "X-Api-Id",
             "in": "header",
             "required": true,
@@ -1389,20 +1263,6 @@
         ],
         "parameters": [
           {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
-          {
             "name": "X-Api-Id",
             "in": "header",
             "required": true,
@@ -1525,20 +1385,6 @@
         ],
         "parameters": [
           {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
-          {
             "name": "X-Api-Id",
             "in": "header",
             "required": true,
@@ -1660,20 +1506,6 @@
           }
         ],
         "parameters": [
-          {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
           {
             "name": "X-Api-Id",
             "in": "header",
@@ -1798,20 +1630,6 @@
           }
         ],
         "parameters": [
-          {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
           {
             "name": "X-Api-Id",
             "in": "header",
@@ -1947,20 +1765,6 @@
         ],
         "parameters": [
           {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
-          {
             "name": "X-Api-Id",
             "in": "header",
             "required": true,
@@ -2087,20 +1891,6 @@
           }
         ],
         "parameters": [
-          {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
           {
             "name": "X-Api-Id",
             "in": "header",
@@ -2240,20 +2030,6 @@
         ],
         "parameters": [
           {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
-          {
             "name": "X-Api-Id",
             "in": "header",
             "required": true,
@@ -2380,20 +2156,6 @@
           }
         ],
         "parameters": [
-          {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
           {
             "name": "X-Api-Id",
             "in": "header",
@@ -2535,20 +2297,6 @@
           }
         ],
         "parameters": [
-          {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
           {
             "name": "X-Api-Id",
             "in": "header",
@@ -2698,20 +2446,6 @@
           }
         ],
         "parameters": [
-          {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
           {
             "name": "X-Api-Id",
             "in": "header",
@@ -2863,20 +2597,6 @@
         ],
         "parameters": [
           {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
-          {
             "name": "X-Api-Id",
             "in": "header",
             "required": true,
@@ -3011,20 +2731,6 @@
           }
         ],
         "parameters": [
-          {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
           {
             "name": "X-Api-Id",
             "in": "header",
@@ -3168,20 +2874,6 @@
         ],
         "parameters": [
           {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
-          {
             "name": "X-Api-Id",
             "in": "header",
             "required": true,
@@ -3303,20 +2995,6 @@
           }
         ],
         "parameters": [
-          {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
           {
             "name": "X-Api-Id",
             "in": "header",
@@ -3446,20 +3124,6 @@
           }
         ],
         "parameters": [
-          {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
           {
             "name": "X-Api-Id",
             "in": "header",
@@ -3597,20 +3261,6 @@
         ],
         "parameters": [
           {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
-          {
             "name": "X-Api-Id",
             "in": "header",
             "required": true,
@@ -3741,20 +3391,6 @@
         ],
         "parameters": [
           {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
-          {
             "name": "X-Api-Id",
             "in": "header",
             "required": true,
@@ -3876,20 +3512,6 @@
           }
         ],
         "parameters": [
-          {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
           {
             "name": "X-Api-Id",
             "in": "header",
@@ -4018,20 +3640,6 @@
         ],
         "parameters": [
           {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
-          {
             "name": "X-Api-Id",
             "in": "header",
             "required": true,
@@ -4154,20 +3762,6 @@
         ],
         "parameters": [
           {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
-          {
             "name": "X-Api-Id",
             "in": "header",
             "required": true,
@@ -4289,20 +3883,6 @@
           }
         ],
         "parameters": [
-          {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
           {
             "name": "X-Api-Id",
             "in": "header",
@@ -4447,20 +4027,6 @@
         ],
         "parameters": [
           {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
-          {
             "name": "X-Api-Id",
             "in": "header",
             "required": true,
@@ -4587,20 +4153,6 @@
         ],
         "parameters": [
           {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
-          {
             "name": "X-Api-Id",
             "in": "header",
             "required": true,
@@ -4714,20 +4266,6 @@
           }
         ],
         "parameters": [
-          {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
           {
             "name": "X-Api-Id",
             "in": "header",
@@ -4852,20 +4390,6 @@
         ],
         "parameters": [
           {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
-          {
             "name": "X-Api-Id",
             "in": "header",
             "required": true,
@@ -4987,20 +4511,6 @@
           }
         ],
         "parameters": [
-          {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
           {
             "name": "X-Api-Id",
             "in": "header",
@@ -5133,20 +4643,6 @@
         ],
         "parameters": [
           {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
-          {
             "name": "X-Api-Id",
             "in": "header",
             "required": true,
@@ -5269,20 +4765,6 @@
         ],
         "parameters": [
           {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
-          {
             "name": "X-Api-Id",
             "in": "header",
             "required": true,
@@ -5401,20 +4883,6 @@
           }
         ],
         "parameters": [
-          {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
           {
             "name": "X-Api-Id",
             "in": "header",
@@ -5538,20 +5006,6 @@
         ],
         "parameters": [
           {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
-          {
             "name": "X-Api-Id",
             "in": "header",
             "required": true,
@@ -5673,20 +5127,6 @@
           }
         ],
         "parameters": [
-          {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
           {
             "name": "X-Api-Id",
             "in": "header",
@@ -5814,20 +5254,6 @@
           }
         ],
         "parameters": [
-          {
-            "name": "X-Account-Type",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "pull",
-                "main"
-              ],
-              "default": "pull"
-            },
-            "description": "Account type for the operation"
-          },
           {
             "name": "X-Api-Id",
             "in": "header",
