@@ -1,4 +1,5 @@
 import { Api } from 'telegram/tl';
+import bigInt from 'big-integer';
 import { BaseTelegramClient } from '../../client/baseClient';
 import { ValidateSessionResponse } from '../../types';
 
@@ -30,9 +31,9 @@ export class UserOperations extends BaseTelegramClient {
           is_premium: me.premium,
           phone: me.phone,
           about: fullUser.fullUser.about,
-          profile_photo: fullUser.fullUser.profilePhoto ? {
+          profile_photo: fullUser.fullUser.profilePhoto && fullUser.fullUser.profilePhoto.className !== 'PhotoEmpty' ? {
             id: fullUser.fullUser.profilePhoto.id?.toString(),
-            dc_id: fullUser.fullUser.profilePhoto.dcId
+            dc_id: (fullUser.fullUser.profilePhoto as any).dcId
           } : undefined,
           common_chats_count: fullUser.fullUser.commonChatsCount,
           blocked: fullUser.fullUser.blocked,
@@ -80,15 +81,18 @@ export class UserOperations extends BaseTelegramClient {
         success: true,
         users: validUsers.map(user => ({
           id: user.id?.toString(),
-          username: user.username,
-          first_name: user.firstName,
-          last_name: user.lastName,
-          is_bot: user.bot,
-          is_premium: user.premium,
-          is_verified: user.verified,
-          is_restricted: user.restricted,
-          is_scam: user.scam,
-          is_fake: user.fake
+          // Only include properties that exist on User entities
+          ...(user.className === 'User' ? {
+            username: (user as any).username,
+            first_name: (user as any).firstName,
+            last_name: (user as any).lastName,
+            is_bot: (user as any).bot,
+            is_premium: (user as any).premium,
+            is_verified: (user as any).verified,
+            is_restricted: (user as any).restricted,
+            is_scam: (user as any).scam,
+            is_fake: (user as any).fake
+          } : {})
         }))
       };
     } catch (error: any) {
@@ -111,7 +115,7 @@ export class UserOperations extends BaseTelegramClient {
       const photos = await this.client.invoke(new Api.photos.GetUserPhotos({
         userId: user,
         offset: 0,
-        maxId: 0,
+        maxId: bigInt(0),
         limit: limit
       }));
 
@@ -119,13 +123,16 @@ export class UserOperations extends BaseTelegramClient {
         success: true,
         photos: photos.photos.map(photo => ({
           id: photo.id?.toString(),
-          date: photo.date,
-          sizes: photo.sizes?.map((size: any) => ({
-            type: size.type,
-            width: size.w,
-            height: size.h,
-            size: size.size
-          }))
+          // Only include properties that exist on Photo entities
+          ...(photo.className === 'Photo' ? {
+            date: (photo as any).date,
+            sizes: (photo as any).sizes?.map((size: any) => ({
+              type: size.type,
+              width: size.w,
+              height: size.h,
+              size: size.size
+            }))
+          } : {})
         }))
       };
     } catch (error: any) {
@@ -148,7 +155,7 @@ export class UserOperations extends BaseTelegramClient {
     try {
       await this.ensureConnected();
 
-      const promises = [];
+      const promises: Promise<any>[] = [];
 
       // Update name if provided
       if (updates.firstName !== undefined || updates.lastName !== undefined) {
@@ -204,9 +211,12 @@ export class UserOperations extends BaseTelegramClient {
           const user = users[index];
           return {
             id: user?.id?.toString(),
-            username: user?.username,
-            first_name: user?.firstName,
-            last_name: user?.lastName,
+            // Only include properties that exist on User entities
+            ...(user?.className === 'User' ? {
+              username: (user as any).username,
+              first_name: (user as any).firstName,
+              last_name: (user as any).lastName
+            } : {}),
             date: blockedUser.date
           };
         })

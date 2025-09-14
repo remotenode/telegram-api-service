@@ -1,4 +1,7 @@
 import { Api } from 'telegram/tl';
+import bigInt from 'big-integer';
+import { getFileInfo } from 'telegram/Utils';
+import { CustomFile } from 'telegram/client/uploads';
 import { BaseTelegramClient } from '../../client/baseClient';
 import { Buffer } from 'buffer';
 
@@ -107,7 +110,11 @@ export class MediaOperations extends BaseTelegramClient {
       await this.ensureConnected();
 
       const buffer = await this.client.downloadMedia(messageOrMedia, {
-        progressCallback: options?.progressCallback
+        progressCallback: options?.progressCallback ? (downloaded: bigInt.BigInteger, total: bigInt.BigInteger) => {
+          // Convert BigInteger to number for the user's callback
+          const progress = total.isZero() ? 0 : downloaded.toJSNumber() / total.toJSNumber();
+          options.progressCallback!(progress);
+        } : undefined
       });
 
       if (!buffer) {
@@ -140,19 +147,12 @@ export class MediaOperations extends BaseTelegramClient {
     try {
       await this.ensureConnected();
 
-      // Get file attributes
-      const attributes = await this.client.getAttributes(fileLocation);
+      // Get file information
+      const fileInfo = getFileInfo(fileLocation);
 
       return {
         success: true,
-        fileInfo: {
-          name: attributes.fileName,
-          size: attributes.size,
-          mimeType: attributes.mimeType,
-          width: attributes.width,
-          height: attributes.height,
-          duration: attributes.duration
-        }
+        fileInfo: fileInfo
       };
     } catch (error: any) {
       console.error('Failed to get file info:', error);
@@ -219,8 +219,9 @@ export class MediaOperations extends BaseTelegramClient {
       const entity = await this.client.getEntity(chatId);
       
       // Upload the photo first
+      const customFile = new CustomFile('photo.jpg', Buffer.isBuffer(photo) ? photo.length : photo.length, '', Buffer.isBuffer(photo) ? photo : Buffer.from(photo));
       const file = await this.client.uploadFile({
-        file: photo,
+        file: customFile,
         workers: 1
       });
 

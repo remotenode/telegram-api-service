@@ -1,0 +1,5950 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Telegram API Service",
+    "description": "A comprehensive Telegram API service built with TypeScript and the telegram (gramjs) library for real MTProto integration. Provides access to all major Telegram operations including messaging, media, payments, channels, and user management. All endpoints use header-based authentication for security.",
+    "version": "2.0.0",
+    "contact": {
+      "name": "API Support",
+      "email": "support@example.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://your-vercel-app.vercel.app",
+      "description": "Production server"
+    },
+    {
+      "url": "http://localhost:3000",
+      "description": "Development server"
+    }
+  ],
+  "security": [
+    {
+      "TelegramAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "TelegramAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Api-Id",
+        "description": "Telegram API credentials passed via headers"
+      }
+    },
+    "schemas": {
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the operation was successful"
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if operation failed"
+          }
+        }
+      },
+      "TelegramHeaders": {
+        "type": "object",
+        "required": [
+          "X-Api-Id",
+          "X-Api-Hash",
+          "X-Session-String",
+          "X-User-Id"
+        ],
+        "properties": {
+          "X-Account-Type": {
+            "type": "string",
+            "enum": [
+              "pull",
+              "main"
+            ],
+            "default": "pull",
+            "description": "Account type for the operation"
+          },
+          "X-Api-Id": {
+            "type": "string",
+            "description": "Telegram API ID"
+          },
+          "X-Api-Hash": {
+            "type": "string",
+            "description": "Telegram API Hash"
+          },
+          "X-Session-String": {
+            "type": "string",
+            "description": "Telegram session string"
+          },
+          "X-User-Id": {
+            "type": "string",
+            "description": "Telegram user ID"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "Session validation and user authentication"
+    },
+    {
+      "name": "Users",
+      "description": "User management and profile operations"
+    },
+    {
+      "name": "Channels",
+      "description": "Channel operations and management"
+    },
+    {
+      "name": "Chats",
+      "description": "Chat and group management"
+    },
+    {
+      "name": "Messages",
+      "description": "Message sending, forwarding, and management"
+    },
+    {
+      "name": "Media",
+      "description": "Media upload, download, and management"
+    },
+    {
+      "name": "Payments",
+      "description": "Payment processing and gift codes"
+    }
+  ],
+  "paths": {
+    "/api/validate-session": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Validate Telegram Session",
+        "description": "Validates a Telegram session and returns detailed user information",
+        "operationId": "validateSession",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/get-users": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get Users",
+        "description": "Get information about multiple users by their IDs",
+        "operationId": "getUsers",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ids"
+                ],
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Array of user IDs to retrieve"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/get-user-photos": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get User Photos",
+        "description": "Get photos from a user's profile",
+        "operationId": "getUserPhotos",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "description": "User ID"
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "default": 10,
+                    "description": "Number of photos to retrieve"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/get-blocked-users": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get Blocked Users",
+        "description": "Get list of blocked users",
+        "operationId": "getBlockedUsers",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "limit": {
+                    "type": "integer",
+                    "default": 100,
+                    "description": "Number of blocked users to retrieve"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/update-profile": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Update Profile",
+        "description": "Update user profile information",
+        "operationId": "updateProfile",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "firstName": {
+                    "type": "string",
+                    "description": "First name"
+                  },
+                  "lastName": {
+                    "type": "string",
+                    "description": "Last name"
+                  },
+                  "about": {
+                    "type": "string",
+                    "description": "About/bio text"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/channels/get-similar-channels": {
+      "post": {
+        "tags": [
+          "Channels"
+        ],
+        "summary": "Get Similar Channels",
+        "description": "Get channels similar to a specified channel",
+        "operationId": "getSimilarChannels",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "channelId"
+                ],
+                "properties": {
+                  "channelId": {
+                    "type": "string",
+                    "description": "Channel ID to find similar channels for"
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "default": 10,
+                    "description": "Number of similar channels to retrieve"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/channels/get-channel-info": {
+      "post": {
+        "tags": [
+          "Channels"
+        ],
+        "summary": "Get Channel Info",
+        "description": "Get detailed information about a channel",
+        "operationId": "getChannelInfo",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "channelId"
+                ],
+                "properties": {
+                  "channelId": {
+                    "type": "string",
+                    "description": "Channel ID"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/channels/get-channel-participants": {
+      "post": {
+        "tags": [
+          "Channels"
+        ],
+        "summary": "Get Channel Participants",
+        "description": "Get participants of a channel",
+        "operationId": "getChannelParticipants",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "channelId"
+                ],
+                "properties": {
+                  "channelId": {
+                    "type": "string",
+                    "description": "Channel ID"
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "default": 100,
+                    "description": "Number of participants to retrieve"
+                  },
+                  "filter": {
+                    "type": "string",
+                    "enum": [
+                      "all",
+                      "admins",
+                      "kicked",
+                      "bots",
+                      "recent"
+                    ],
+                    "default": "all",
+                    "description": "Filter type for participants"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/channels/search-channels": {
+      "post": {
+        "tags": [
+          "Channels"
+        ],
+        "summary": "Search Channels",
+        "description": "Search for channels by query",
+        "operationId": "searchChannels",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "Search query"
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "default": 20,
+                    "description": "Number of results to retrieve"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/channels/join-channel": {
+      "post": {
+        "tags": [
+          "Channels"
+        ],
+        "summary": "Join Channel",
+        "description": "Join a channel",
+        "operationId": "joinChannel",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "channelId"
+                ],
+                "properties": {
+                  "channelId": {
+                    "type": "string",
+                    "description": "Channel ID to join"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/channels/leave-channel": {
+      "post": {
+        "tags": [
+          "Channels"
+        ],
+        "summary": "Leave Channel",
+        "description": "Leave a channel",
+        "operationId": "leaveChannel",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "channelId"
+                ],
+                "properties": {
+                  "channelId": {
+                    "type": "string",
+                    "description": "Channel ID to leave"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chats/get-dialogs": {
+      "post": {
+        "tags": [
+          "Chats"
+        ],
+        "summary": "Get Dialogs",
+        "description": "Get all dialogs/chats",
+        "operationId": "getDialogs",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "limit": {
+                    "type": "integer",
+                    "default": 100,
+                    "description": "Number of dialogs to retrieve"
+                  },
+                  "offsetDate": {
+                    "type": "integer",
+                    "description": "Offset date for pagination"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chats/create-group": {
+      "post": {
+        "tags": [
+          "Chats"
+        ],
+        "summary": "Create Group",
+        "description": "Create a new group chat",
+        "operationId": "createGroup",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "title",
+                  "users"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "Group title"
+                  },
+                  "users": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Array of user IDs to add to the group"
+                  },
+                  "about": {
+                    "type": "string",
+                    "description": "Group description"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chats/archive-chat": {
+      "post": {
+        "tags": [
+          "Chats"
+        ],
+        "summary": "Archive Chat",
+        "description": "Archive or unarchive a chat",
+        "operationId": "archiveChat",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "chatId"
+                ],
+                "properties": {
+                  "chatId": {
+                    "type": "string",
+                    "description": "Chat ID"
+                  },
+                  "archive": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Whether to archive (true) or unarchive (false)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chats/mute-chat": {
+      "post": {
+        "tags": [
+          "Chats"
+        ],
+        "summary": "Mute Chat",
+        "description": "Mute or unmute a chat",
+        "operationId": "muteChat",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "chatId"
+                ],
+                "properties": {
+                  "chatId": {
+                    "type": "string",
+                    "description": "Chat ID"
+                  },
+                  "muteUntil": {
+                    "oneOf": [
+                      {
+                        "type": "integer",
+                        "description": "Unix timestamp"
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          "forever"
+                        ],
+                        "description": "Mute forever"
+                      }
+                    ],
+                    "description": "Mute until timestamp or 'forever'"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chats/get-common-chats": {
+      "post": {
+        "tags": [
+          "Chats"
+        ],
+        "summary": "Get Common Chats",
+        "description": "Get common chats with a user",
+        "operationId": "getCommonChats",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "description": "User ID"
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "default": 100,
+                    "description": "Number of chats to retrieve"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chats/report-chat": {
+      "post": {
+        "tags": [
+          "Chats"
+        ],
+        "summary": "Report Chat",
+        "description": "Report a chat for violations",
+        "operationId": "reportChat",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "chatId",
+                  "reason"
+                ],
+                "properties": {
+                  "chatId": {
+                    "type": "string",
+                    "description": "Chat ID"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "enum": [
+                      "spam",
+                      "violence",
+                      "pornography",
+                      "child_abuse",
+                      "copyright",
+                      "illegal_drugs",
+                      "personal_details",
+                      "other"
+                    ],
+                    "description": "Report reason"
+                  },
+                  "comment": {
+                    "type": "string",
+                    "description": "Additional comment"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/messages/send-message": {
+      "post": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "Send Message",
+        "description": "Send a message to a chat",
+        "operationId": "sendMessage",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "chatId",
+                  "message"
+                ],
+                "properties": {
+                  "chatId": {
+                    "type": "string",
+                    "description": "Chat ID"
+                  },
+                  "message": {
+                    "type": "string",
+                    "description": "Message text"
+                  },
+                  "replyTo": {
+                    "type": "integer",
+                    "description": "Message ID to reply to"
+                  },
+                  "parseMode": {
+                    "type": "string",
+                    "description": "Parse mode for message formatting"
+                  },
+                  "linkPreview": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable link preview"
+                  },
+                  "silent": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Send silently"
+                  },
+                  "scheduleDate": {
+                    "type": "integer",
+                    "description": "Schedule message for later (Unix timestamp)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/messages/forward-messages": {
+      "post": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "Forward Messages",
+        "description": "Forward messages from one chat to another",
+        "operationId": "forwardMessages",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "fromChatId",
+                  "toChatId",
+                  "messageIds"
+                ],
+                "properties": {
+                  "fromChatId": {
+                    "type": "string",
+                    "description": "Source chat ID"
+                  },
+                  "toChatId": {
+                    "type": "string",
+                    "description": "Destination chat ID"
+                  },
+                  "messageIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "description": "Array of message IDs to forward"
+                  },
+                  "silent": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Forward silently"
+                  },
+                  "dropAuthor": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Remove author information"
+                  },
+                  "dropMediaCaptions": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Remove media captions"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/messages/delete-messages": {
+      "post": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "Delete Messages",
+        "description": "Delete messages from a chat",
+        "operationId": "deleteMessages",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "chatId",
+                  "messageIds"
+                ],
+                "properties": {
+                  "chatId": {
+                    "type": "string",
+                    "description": "Chat ID"
+                  },
+                  "messageIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "description": "Array of message IDs to delete"
+                  },
+                  "revoke": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Revoke messages for all users"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/messages/pin-message": {
+      "post": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "Pin Message",
+        "description": "Pin or unpin a message in a chat",
+        "operationId": "pinMessage",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "chatId",
+                  "messageId"
+                ],
+                "properties": {
+                  "chatId": {
+                    "type": "string",
+                    "description": "Chat ID"
+                  },
+                  "messageId": {
+                    "type": "integer",
+                    "description": "Message ID to pin"
+                  },
+                  "silent": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Pin silently"
+                  },
+                  "unpin": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Unpin the message"
+                  },
+                  "pmOneside": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Pin for one side only"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/messages/get-pinned-messages": {
+      "post": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "Get Pinned Messages",
+        "description": "Get pinned messages from a chat",
+        "operationId": "getPinnedMessages",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "chatId"
+                ],
+                "properties": {
+                  "chatId": {
+                    "type": "string",
+                    "description": "Chat ID"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/messages/mark-as-read": {
+      "post": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "Mark as Read",
+        "description": "Mark messages as read",
+        "operationId": "markAsRead",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "chatId"
+                ],
+                "properties": {
+                  "chatId": {
+                    "type": "string",
+                    "description": "Chat ID"
+                  },
+                  "messageIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "description": "Array of message IDs to mark as read"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/messages/send-typing": {
+      "post": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "Send Typing",
+        "description": "Send typing indicator",
+        "operationId": "sendTyping",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "chatId"
+                ],
+                "properties": {
+                  "chatId": {
+                    "type": "string",
+                    "description": "Chat ID"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "typing",
+                      "cancel",
+                      "recording",
+                      "upload_photo",
+                      "upload_video",
+                      "upload_audio",
+                      "upload_document"
+                    ],
+                    "default": "typing",
+                    "description": "Typing action type"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/media/download-media": {
+      "post": {
+        "tags": [
+          "Media"
+        ],
+        "summary": "Download Media",
+        "description": "Download media from a message",
+        "operationId": "downloadMedia",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "messageOrMedia"
+                ],
+                "properties": {
+                  "messageOrMedia": {
+                    "type": "object",
+                    "description": "Message or media object"
+                  },
+                  "outputPath": {
+                    "type": "string",
+                    "description": "Output file path"
+                  },
+                  "progressCallback": {
+                    "type": "boolean",
+                    "description": "Enable progress callback"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/media/get-file-info": {
+      "post": {
+        "tags": [
+          "Media"
+        ],
+        "summary": "Get File Info",
+        "description": "Get information about a file",
+        "operationId": "getFileInfo",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "fileLocation"
+                ],
+                "properties": {
+                  "fileLocation": {
+                    "type": "object",
+                    "description": "File location object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/media/set-chat-photo": {
+      "post": {
+        "tags": [
+          "Media"
+        ],
+        "summary": "Set Chat Photo",
+        "description": "Set a photo for a chat",
+        "operationId": "setChatPhoto",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "chatId",
+                  "photo"
+                ],
+                "properties": {
+                  "chatId": {
+                    "type": "string",
+                    "description": "Chat ID"
+                  },
+                  "photo": {
+                    "type": "string",
+                    "description": "Photo data (base64 or buffer)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/media/delete-chat-photo": {
+      "post": {
+        "tags": [
+          "Media"
+        ],
+        "summary": "Delete Chat Photo",
+        "description": "Delete a chat's photo",
+        "operationId": "deleteChatPhoto",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "chatId"
+                ],
+                "properties": {
+                  "chatId": {
+                    "type": "string",
+                    "description": "Chat ID"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/get-payment-form": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Get Payment Form",
+        "description": "Get payment form for an invoice",
+        "operationId": "getPaymentForm",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "invoice"
+                ],
+                "properties": {
+                  "invoice": {
+                    "type": "object",
+                    "description": "Invoice object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/send-payment-form": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Send Payment Form",
+        "description": "Send payment form",
+        "operationId": "sendPaymentForm",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "formId",
+                  "invoice"
+                ],
+                "properties": {
+                  "formId": {
+                    "type": "string",
+                    "description": "Payment form ID"
+                  },
+                  "invoice": {
+                    "type": "object",
+                    "description": "Invoice object"
+                  },
+                  "requestedInfoId": {
+                    "type": "string",
+                    "description": "Requested info ID"
+                  },
+                  "shippingOptionId": {
+                    "type": "string",
+                    "description": "Shipping option ID"
+                  },
+                  "credentials": {
+                    "type": "object",
+                    "description": "Payment credentials"
+                  },
+                  "tipAmount": {
+                    "type": "number",
+                    "description": "Tip amount"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/get-payment-receipt": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Get Payment Receipt",
+        "description": "Get payment receipt",
+        "operationId": "getPaymentReceipt",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "msgId"
+                ],
+                "properties": {
+                  "msgId": {
+                    "type": "integer",
+                    "description": "Message ID"
+                  },
+                  "peer": {
+                    "type": "object",
+                    "description": "Peer object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/get-saved-info": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Get Saved Info",
+        "description": "Get saved payment information",
+        "operationId": "getSavedInfo",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/clear-saved-info": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Clear Saved Info",
+        "description": "Clear saved payment information",
+        "operationId": "clearSavedInfo",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "info": {
+                    "type": "boolean",
+                    "description": "Clear info"
+                  },
+                  "credentials": {
+                    "type": "boolean",
+                    "description": "Clear credentials"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/get-bank-card-data": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Get Bank Card Data",
+        "description": "Get bank card data",
+        "operationId": "getBankCardData",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "number"
+                ],
+                "properties": {
+                  "number": {
+                    "type": "string",
+                    "description": "Bank card number"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/validate-requested-info": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Validate Requested Info",
+        "description": "Validate requested payment information",
+        "operationId": "validateRequestedInfo",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "invoice",
+                  "info"
+                ],
+                "properties": {
+                  "invoice": {
+                    "type": "object",
+                    "description": "Invoice object"
+                  },
+                  "info": {
+                    "type": "object",
+                    "description": "Info object"
+                  },
+                  "save": {
+                    "type": "boolean",
+                    "description": "Save the info"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/export-invoice": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Export Invoice",
+        "description": "Export invoice as URL",
+        "operationId": "exportInvoice",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "invoiceMedia"
+                ],
+                "properties": {
+                  "invoiceMedia": {
+                    "type": "object",
+                    "description": "Invoice media object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/get-premium-gift-code-options": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Get Premium Gift Code Options",
+        "description": "Get premium gift code options",
+        "operationId": "getPremiumGiftCodeOptions",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "boostPeer": {
+                    "type": "object",
+                    "description": "Boost peer object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/check-gift-code": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Check Gift Code",
+        "description": "Check a gift code",
+        "operationId": "checkGiftCode",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "slug"
+                ],
+                "properties": {
+                  "slug": {
+                    "type": "string",
+                    "description": "Gift code slug"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/apply-gift-code": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Apply Gift Code",
+        "description": "Apply a gift code",
+        "operationId": "applyGiftCode",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "slug"
+                ],
+                "properties": {
+                  "slug": {
+                    "type": "string",
+                    "description": "Gift code slug"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/get-giveaway-info": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Get Giveaway Info",
+        "description": "Get giveaway information",
+        "operationId": "getGiveawayInfo",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "peer",
+                  "msgId"
+                ],
+                "properties": {
+                  "peer": {
+                    "type": "object",
+                    "description": "Peer object"
+                  },
+                  "msgId": {
+                    "type": "integer",
+                    "description": "Message ID"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/launch-prepaid-giveaway": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "Launch Prepaid Giveaway",
+        "description": "Launch a prepaid giveaway",
+        "operationId": "launchPrepaidGiveaway",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Account-Type",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pull",
+                "main"
+              ],
+              "default": "pull"
+            },
+            "description": "Account type for the operation"
+          },
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "peer",
+                  "giveawayId",
+                  "purpose"
+                ],
+                "properties": {
+                  "peer": {
+                    "type": "object",
+                    "description": "Peer object"
+                  },
+                  "giveawayId": {
+                    "type": "string",
+                    "description": "Giveaway ID"
+                  },
+                  "purpose": {
+                    "type": "object",
+                    "description": "Purpose object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Missing required headers or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid Telegram credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

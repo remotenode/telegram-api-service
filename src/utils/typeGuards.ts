@@ -19,7 +19,7 @@ export function isUserFull(user: any): user is Api.User {
 
 // Safely get property with fallback
 export function safeGet<T, K extends keyof T>(obj: T | undefined, key: K, fallback?: T[K]): T[K] | undefined {
-  return obj && key in obj ? obj[key] : fallback;
+  return obj && typeof obj === 'object' && key in obj ? obj[key] : fallback;
 }
 
 // Convert BigInt to regular number for API responses

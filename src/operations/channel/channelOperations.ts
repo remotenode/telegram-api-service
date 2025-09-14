@@ -1,4 +1,5 @@
 import { Api } from 'telegram/tl';
+import bigInt from 'big-integer';
 import { BaseTelegramClient } from '../../client/baseClient';
 import { TelegramChannel, GetSimilarChannelsResponse } from '../../types';
 
@@ -167,7 +168,7 @@ export class ChannelOperations extends BaseTelegramClient {
         filter: participantsFilter,
         offset: 0,
         limit: limit,
-        hash: BigInt(0)
+        hash: bigInt(0)
       }));
 
       if (!('participants' in participants)) {

@@ -7,7 +7,14 @@
     "dev": "vercel dev",
     "build": "tsc",
     "start": "node dist/index.js",
-    "deploy": "vercel --prod"
+    "deploy": "vercel --prod",
+    "test:integration": "ts-node tests/integration/test-runner.ts",
+    "test:user": "ts-node -e \"import('./tests/integration/user.test').then(m => m.testUserOperations(require('./tests/integration/credentials').credentials))\"",
+    "test:message": "ts-node -e \"import('./tests/integration/message.test').then(m => m.testMessageOperations(require('./tests/integration/credentials').credentials))\"",
+    "test:chat": "ts-node -e \"import('./tests/integration/chat.test').then(m => m.testChatOperations(require('./tests/integration/credentials').credentials))\"",
+    "test:channel": "ts-node -e \"import('./tests/integration/channel.test').then(m => m.testChannelOperations(require('./tests/integration/credentials').credentials))\"",
+    "test:media": "ts-node -e \"import('./tests/integration/media.test').then(m => m.testMediaOperations(require('./tests/integration/credentials').credentials))\"",
+    "test:payment": "ts-node -e \"import('./tests/integration/payment.test').then(m => m.testPaymentOperations(require('./tests/integration/credentials').credentials))\""
   },
   "dependencies": {
     "telegram": "^2.26.22",
@@ -16,6 +23,7 @@
   "devDependencies": {
     "@types/node": "^20.0.0",
     "typescript": "^5.0.0",
+    "ts-node": "^10.9.0",
     "vercel": "^32.0.0"
   },
   "engines": {

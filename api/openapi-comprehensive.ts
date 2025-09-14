@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import openApiSpec from '../src/openapi.json';
+import openApiSpec from '../src/openapi-comprehensive.json';
 
 export default function handler(
   req: VercelRequest,

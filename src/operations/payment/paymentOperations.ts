@@ -1,4 +1,5 @@
 import { Api } from 'telegram/tl';
+import bigInt from 'big-integer';
 import { BaseTelegramClient } from '../../client/baseClient';
 
 export class PaymentOperations extends BaseTelegramClient {
@@ -17,21 +18,36 @@ export class PaymentOperations extends BaseTelegramClient {
       return {
         success: true,
         form: {
-          canSaveCredentials: form.canSaveCredentials,
-          passwordMissing: form.passwordMissing,
           formId: form.formId?.toString(),
-          botId: form.botId?.toString(),
-          title: form.title,
-          description: form.description,
-          photo: form.photo,
           invoice: form.invoice,
-          providerId: form.providerId?.toString(),
-          url: form.url,
-          nativeProvider: form.nativeProvider,
-          nativeParams: form.nativeParams,
-          savedInfo: form.savedInfo,
-          savedCredentials: form.savedCredentials,
-          users: form.users
+          // Only include properties that exist on the specific form type
+          ...(form.className === 'payments.PaymentForm' ? {
+            canSaveCredentials: (form as any).canSaveCredentials,
+            passwordMissing: (form as any).passwordMissing,
+            providerId: (form as any).providerId?.toString(),
+            url: (form as any).url,
+            nativeProvider: (form as any).nativeProvider,
+            nativeParams: (form as any).nativeParams,
+            savedInfo: (form as any).savedInfo,
+            savedCredentials: (form as any).savedCredentials
+          } : {}),
+          ...(form.className === 'payments.PaymentFormStars' ? {
+            canSaveCredentials: (form as any).canSaveCredentials,
+            passwordMissing: (form as any).passwordMissing,
+            providerId: (form as any).providerId?.toString(),
+            url: (form as any).url,
+            nativeProvider: (form as any).nativeProvider,
+            nativeParams: (form as any).nativeParams,
+            savedInfo: (form as any).savedInfo,
+            savedCredentials: (form as any).savedCredentials
+          } : {}),
+          ...(form.className === 'payments.PaymentFormStarGift' ? {
+            botId: (form as any).botId?.toString(),
+            title: (form as any).title,
+            description: (form as any).description,
+            photo: (form as any).photo,
+            users: (form as any).users
+          } : {})
         }
       };
     } catch (error: any) {
@@ -51,7 +67,7 @@ export class PaymentOperations extends BaseTelegramClient {
       await this.ensureConnected();
 
       const result = await this.client.invoke(new Api.payments.SendPaymentForm({
-        formId: BigInt(formId),
+        formId: bigInt(formId.toString()),
         invoice: invoice,
         requestedInfoId: requestedInfoId,
         shippingOptionId: shippingOptionId,
@@ -61,7 +77,7 @@ export class PaymentOperations extends BaseTelegramClient {
             data: JSON.stringify({})
           })
         }),
-        tipAmount: tipAmount
+        tipAmount: tipAmount ? bigInt(tipAmount) : undefined
       }));
 
       return {
@@ -97,19 +113,29 @@ export class PaymentOperations extends BaseTelegramClient {
         success: true,
         receipt: {
           date: receipt.date,
-          botId: receipt.botId?.toString(),
-          providerId: receipt.providerId?.toString(),
-          title: receipt.title,
-          description: receipt.description,
-          photo: receipt.photo,
           invoice: receipt.invoice,
-          info: receipt.info,
-          shipping: receipt.shipping,
           currency: receipt.currency,
           totalAmount: receipt.totalAmount?.toString(),
-          credentialsTitle: receipt.credentialsTitle,
-          tipAmount: receipt.tipAmount?.toString(),
-          users: receipt.users
+          users: receipt.users,
+          // Only include properties that exist on the specific receipt type
+          ...(receipt.className === 'payments.PaymentReceipt' ? {
+            botId: (receipt as any).botId?.toString(),
+            providerId: (receipt as any).providerId?.toString(),
+            title: (receipt as any).title,
+            description: (receipt as any).description,
+            photo: (receipt as any).photo,
+            info: (receipt as any).info,
+            shipping: (receipt as any).shipping,
+            credentialsTitle: (receipt as any).credentialsTitle,
+            tipAmount: (receipt as any).tipAmount?.toString()
+          } : {}),
+          ...(receipt.className === 'payments.PaymentReceiptStars' ? {
+            providerId: (receipt as any).providerId?.toString(),
+            info: (receipt as any).info,
+            shipping: (receipt as any).shipping,
+            credentialsTitle: (receipt as any).credentialsTitle,
+            tipAmount: (receipt as any).tipAmount?.toString()
+          } : {})
         }
       };
     } catch (error: any) {
@@ -307,7 +333,6 @@ export class PaymentOperations extends BaseTelegramClient {
           toId: result.toId?.toString(),
           viaGiveaway: result.viaGiveaway,
           giveawayMsgId: result.giveawayMsgId,
-          slug: result.slug,
           chats: result.chats,
           users: result.users
         }
@@ -389,7 +414,7 @@ export class PaymentOperations extends BaseTelegramClient {
 
       const result = await this.client.invoke(new Api.payments.LaunchPrepaidGiveaway({
         peer: peer,
-        giveawayId: BigInt(giveawayId),
+        giveawayId: bigInt(giveawayId.toString()),
         purpose: purpose
       }));
 

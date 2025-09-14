@@ -1,6 +1,7 @@
 import { Api } from 'telegram/tl';
 import { BaseTelegramClient } from '../../client/baseClient';
 import { Dialog } from 'telegram/tl/custom/dialog';
+import bigInt from 'big-integer';
 
 export class ChatOperations extends BaseTelegramClient {
   /**
@@ -297,7 +298,7 @@ export class ChatOperations extends BaseTelegramClient {
       const user = await this.client.getEntity(userId);
       const result = await this.client.invoke(new Api.messages.GetCommonChats({
         userId: user,
-        maxId: BigInt(0),
+        maxId: bigInt(0),
         limit: limit
       }));
 

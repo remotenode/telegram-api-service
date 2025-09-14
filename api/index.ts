@@ -143,23 +143,23 @@ export default function handler(
       <section class="section">
         <h2>📚 API Documentation</h2>
         <div class="docs-grid">
-          <a href="/api/docs" class="doc-card">
-            <h3>Swagger UI</h3>
-            <p>Interactive API documentation with a modern interface. Test endpoints directly from your browser.</p>
+          <a href="/swagger" class="doc-card">
+            <h3>🚀 Swagger UI</h3>
+            <p>Interactive API documentation with all 41+ endpoints. Test endpoints directly from your browser with header-based authentication.</p>
           </a>
-          <a href="/api/redoc" class="doc-card">
-            <h3>ReDoc</h3>
-            <p>Clean, responsive, three-panel documentation. Perfect for API reference and integration guides.</p>
+          <a href="/redoc" class="doc-card">
+            <h3>📚 ReDoc</h3>
+            <p>Clean, responsive, three-panel documentation with all available endpoints. Perfect for API reference and integration guides.</p>
           </a>
-          <a href="/api/openapi" class="doc-card">
-            <h3>OpenAPI Spec</h3>
-            <p>Raw OpenAPI 3.0 specification in JSON format. Import into your favorite API tools.</p>
+          <a href="/openapi" class="doc-card">
+            <h3>📋 OpenAPI Spec</h3>
+            <p>Complete OpenAPI 3.0 specification with all 41+ endpoints in JSON format. Import into your favorite API tools.</p>
           </a>
         </div>
       </section>
 
       <section class="section">
-        <h2>🚀 Available Endpoints</h2>
+        <h2>🚀 Available Endpoints (41+ Total)</h2>
         <div class="endpoints">
           <div class="endpoint">
             <span class="method post">POST</span>
@@ -168,10 +168,38 @@ export default function handler(
           </div>
           <div class="endpoint">
             <span class="method post">POST</span>
-            <code>/api/get-similar-channels</code>
-            <p>Returns channels similar to a specified channel using Telegram's recommendation algorithm</p>
+            <code>/api/users/*</code>
+            <p>User management: get users, photos, blocked users, update profile</p>
+          </div>
+          <div class="endpoint">
+            <span class="method post">POST</span>
+            <code>/api/channels/*</code>
+            <p>Channel operations: similar channels, info, participants, search, join/leave</p>
+          </div>
+          <div class="endpoint">
+            <span class="method post">POST</span>
+            <code>/api/chats/*</code>
+            <p>Chat management: dialogs, create groups, archive, mute, report</p>
+          </div>
+          <div class="endpoint">
+            <span class="method post">POST</span>
+            <code>/api/messages/*</code>
+            <p>Messaging: send, forward, delete, pin, mark as read, typing indicators</p>
+          </div>
+          <div class="endpoint">
+            <span class="method post">POST</span>
+            <code>/api/media/*</code>
+            <p>Media operations: download, file info, set/delete chat photos</p>
+          </div>
+          <div class="endpoint">
+            <span class="method post">POST</span>
+            <code>/api/payments/*</code>
+            <p>Payment processing: forms, receipts, gift codes, giveaways, bank cards</p>
           </div>
         </div>
+        <p style="margin-top: 1rem; text-align: center; color: #666;">
+          <strong>View the comprehensive documentation above for detailed endpoint information and schemas.</strong>
+        </p>
       </section>
 
       <section class="section">
@@ -187,16 +215,22 @@ export default function handler(
 
       <section class="section">
         <h2>📖 Quick Start</h2>
-        <p>All endpoints require Telegram API credentials in the request body:</p>
+        <p>All endpoints require Telegram API credentials in the request headers for security:</p>
         <div class="endpoint">
-          <code>{
-  "apiId": 12345,
-  "apiHash": "your-api-hash",
-  "sessionString": "your-session-string",
-  "userId": "123456789"
+          <code>Headers:
+X-Account-Type: pull
+X-Api-Id: 12345
+X-Api-Hash: your-api-hash
+X-Session-String: your-session-string
+X-User-Id: 123456789
+
+Body:
+{
+  "channelId": "channel_username",
+  "limit": 10
 }</code>
         </div>
-        <p style="margin-top: 1rem;">Check out the <a href="/api/docs" style="color: #0088cc;">interactive documentation</a> for detailed examples and schemas.</p>
+        <p style="margin-top: 1rem;">Check out the <a href="/swagger" style="color: #0088cc;">interactive documentation</a> for detailed examples and schemas.</p>
       </section>
     </div>
 

@@ -23,7 +23,7 @@ export class MessageOperations extends BaseTelegramClient {
         parseMode: options?.parseMode,
         linkPreview: options?.linkPreview !== false,
         silent: options?.silent,
-        scheduleDate: options?.scheduleDate
+        schedule: options?.scheduleDate
       });
 
       return {
@@ -202,10 +202,7 @@ export class MessageOperations extends BaseTelegramClient {
         messages: messageIds,
         fromPeer: fromEntity,
         silent: options?.silent,
-        background: options?.background,
-        withMyScore: options?.withMyScore,
         dropAuthor: options?.dropAuthor,
-        dropMediaCaptions: options?.dropMediaCaptions
       });
 
       return {
@@ -240,9 +237,8 @@ export class MessageOperations extends BaseTelegramClient {
 
       const entity = await this.client.getEntity(chatId);
       await this.client.pinMessage(entity, messageId, {
-        silent: options?.silent,
-        unpin: options?.unpin,
-        pmOneside: options?.pmOneside
+        notify: !options?.silent,
+        pmOneSide: options?.pmOneside
       });
 
       return {
