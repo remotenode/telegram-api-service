@@ -60,15 +60,6 @@
           "X-User-Id"
         ],
         "properties": {
-          "X-Account-Type": {
-            "type": "string",
-            "enum": [
-              "pull",
-              "main"
-            ],
-            "default": "pull",
-            "description": "Account type for the operation"
-          },
           "X-Api-Id": {
             "type": "string",
             "description": "Telegram API ID"
