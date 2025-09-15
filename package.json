@@ -67,6 +67,8 @@
     "test:all-individual": "ts-node tests/integration/run-all-individual.ts",
     "test:all-timeout": "ts-node tests/integration/run-individual-with-timeout.ts",
     "test:few": "ts-node tests/integration/run-few-tests.ts",
+    "test:all-sequential": "ts-node tests/integration/run-all-sequential.ts",
+    "test:simple": "ts-node tests/integration/run-simple-tests.ts",
     "docs:generate": "ts-node scripts/generate-docs.ts",
     "docs:serve": "vercel dev --listen 3000"
   },
