@@ -3,7 +3,7 @@
   "info": {
     "title": "Telegram API Service",
     "description": "A comprehensive Telegram API service built with TypeScript and the telegram (gramjs) library for real MTProto integration. Provides access to all major Telegram operations including messaging, media, payments, channels, and user management. All endpoints use header-based authentication for security. Accepts credentials from any Telegram account type.",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "contact": {
       "name": "API Support",
       "email": "support@example.com"
@@ -6106,6 +6106,181 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/messages/get-messages": {
+      "post": {
+        "summary": "Get Messages",
+        "description": "Get specific messages by IDs or with advanced filtering",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "chatId"
+                ],
+                "properties": {
+                  "chatId": {
+                    "type": "string",
+                    "description": "Chat ID"
+                  },
+                  "limit": {
+                    "type": "number",
+                    "default": 100,
+                    "description": "Number of messages to retrieve"
+                  },
+                  "offsetId": {
+                    "type": "number",
+                    "description": "Offset message ID"
+                  },
+                  "offsetDate": {
+                    "type": "number",
+                    "description": "Offset date"
+                  },
+                  "addOffset": {
+                    "type": "number",
+                    "description": "Additional offset"
+                  },
+                  "maxId": {
+                    "type": "number",
+                    "description": "Maximum message ID"
+                  },
+                  "minId": {
+                    "type": "number",
+                    "description": "Minimum message ID"
+                  },
+                  "search": {
+                    "type": "string",
+                    "description": "Search query"
+                  },
+                  "fromUser": {
+                    "type": "string",
+                    "description": "Filter by user ID"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "": "#/components/schemas/GetMessagesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/messages/get-message-history": {
+      "post": {
+        "summary": "Get Message History",
+        "description": "Get message history for a chat",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "chatId"
+                ],
+                "properties": {
+                  "chatId": {
+                    "type": "string",
+                    "description": "Chat ID"
+                  },
+                  "limit": {
+                    "type": "number",
+                    "default": 100,
+                    "description": "Number of messages to retrieve"
+                  },
+                  "offsetId": {
+                    "type": "number",
+                    "description": "Offset message ID"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "": "#/components/schemas/GetMessagesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/messages/edit-message": {
+      "post": {
+        "summary": "Edit Message",
+        "description": "Edit an existing message",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "chatId",
+                  "messageId",
+                  "newText"
+                ],
+                "properties": {
+                  "chatId": {
+                    "type": "string",
+                    "description": "Chat ID"
+                  },
+                  "messageId": {
+                    "type": "number",
+                    "description": "Message ID to edit"
+                  },
+                  "newText": {
+                    "type": "string",
+                    "description": "New message text"
+                  },
+                  "parseMode": {
+                    "type": "string",
+                    "enum": [
+                      "md",
+                      "html"
+                    ],
+                    "description": "Parse mode"
+                  },
+                  "linkPreview": {
+                    "type": "boolean",
+                    "description": "Enable link preview"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "": "#/components/schemas/EditMessageResponse"
                 }
               }
             }
