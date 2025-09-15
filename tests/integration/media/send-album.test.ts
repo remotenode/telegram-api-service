@@ -17,7 +17,9 @@ export async function testSendAlbum(credentials: TestCredentials) {
         TestDataGenerator.generateTestPhoto()
       ];
       
-      const result = await account1.media.sendAlbum(account2Id, photos, 'Test album');
+      const result = await account1.media.sendAlbum(account2Id, photos, {
+        captions: ['Test album photo 1', 'Test album photo 2']
+      });
       if (!result.success) throw new Error('Send album failed');
       return result;
     });

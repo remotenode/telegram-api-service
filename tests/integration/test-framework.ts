@@ -171,4 +171,19 @@ export class TestDataGenerator {
     const content = `Test document content - ${Date.now()}\nGenerated for integration testing.`;
     return Buffer.from(content, 'utf-8');
   }
+
+  static generateTestSticker(): Buffer {
+    // Generate a simple 1x1 pixel PNG for testing (same as photo)
+    return this.generateTestPhoto();
+  }
+
+  static generateTestVideo(): Buffer {
+    // Generate a simple 1x1 pixel PNG for testing (same as photo)
+    return this.generateTestPhoto();
+  }
+
+  static generateTestVoice(): Buffer {
+    // Generate a simple text file for testing (same as document)
+    return this.generateTestDocument();
+  }
 }

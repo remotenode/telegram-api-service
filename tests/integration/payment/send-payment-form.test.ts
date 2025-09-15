@@ -10,7 +10,7 @@ export async function testSendPaymentForm(credentials: TestCredentials) {
     // Test send payment form
     await framework.runTest('Send Payment Form', async (account1) => {
       // Test with invalid payment data (this will likely fail, but that's expected)
-      const result = await account1.payment.sendPaymentForm('test_form_id', {}, {});
+      const result = await account1.payment.sendPaymentForm('test_form_id', {});
       
       // This test is expected to fail with invalid payment data, which is correct behavior
       return { success: true, message: 'Send payment form test completed', result };

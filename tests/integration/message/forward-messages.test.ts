@@ -15,7 +15,7 @@ export async function testForwardMessages(credentials: TestCredentials) {
       const sent = await account1.message.sendMessage(account2Id, `Test message to forward ${Date.now()}`);
       if (!sent.success) throw new Error('Send message failed');
       
-      const result = await account1.message.forwardMessages(account2Id, [sent.message.id]);
+      const result = await account1.message.forwardMessages(account2Id, account2Id, [sent.message.id]);
       if (!result.success) throw new Error('Forward messages failed');
       return result;
     });

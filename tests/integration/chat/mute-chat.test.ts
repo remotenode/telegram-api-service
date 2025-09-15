@@ -11,7 +11,7 @@ export async function testMuteChat(credentials: TestCredentials) {
 
     // Test mute chat
     await framework.runTest('Mute Chat', async (account1) => {
-      const result = await account1.chat.muteChat(account2Id, true);
+      const result = await account1.chat.muteChat(account2Id, Date.now() + 3600000); // Mute for 1 hour
       if (!result.success) throw new Error('Mute chat failed');
       return result;
     });
