@@ -14,16 +14,22 @@
     "test:chat": "ts-node -e \"import('./tests/integration/chat.test').then(m => m.testChatOperations(require('./tests/integration/credentials').credentials))\"",
     "test:channel": "ts-node -e \"import('./tests/integration/channel.test').then(m => m.testChannelOperations(require('./tests/integration/credentials').credentials))\"",
     "test:media": "ts-node -e \"import('./tests/integration/media.test').then(m => m.testMediaOperations(require('./tests/integration/credentials').credentials))\"",
-    "test:payment": "ts-node -e \"import('./tests/integration/payment.test').then(m => m.testPaymentOperations(require('./tests/integration/credentials').credentials))\""
+    "test:payment": "ts-node -e \"import('./tests/integration/payment.test').then(m => m.testPaymentOperations(require('./tests/integration/credentials').credentials))\"",
+    "docs:generate": "ts-node scripts/generate-docs.ts",
+    "docs:serve": "vercel dev --listen 3000"
   },
   "dependencies": {
-    "telegram": "^2.26.22",
-    "@vercel/node": "^3.0.0"
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
+    "@vercel/node": "^3.0.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "telegram": "^2.26.22"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
-    "typescript": "^5.0.0",
     "ts-node": "^10.9.0",
+    "typescript": "^5.0.0",
     "vercel": "^32.0.0"
   },
   "engines": {
