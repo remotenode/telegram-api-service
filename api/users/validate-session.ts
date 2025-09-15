@@ -1,5 +1,5 @@
-import { TelegramService } from '../src/telegramService';
-import { createApiHandler } from '../src/utils/apiHandler';
+import { TelegramService } from '../../src/telegramService';
+import { createApiHandler } from '../../src/utils/apiHandler';
 
 /**
  * @summary Validate Session
