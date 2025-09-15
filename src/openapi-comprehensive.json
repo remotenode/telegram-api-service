@@ -3,7 +3,7 @@
   "info": {
     "title": "Telegram API Service",
     "description": "A comprehensive Telegram API service built with TypeScript and the telegram (gramjs) library for real MTProto integration. Provides access to all major Telegram operations including messaging, media, payments, channels, and user management. All endpoints use header-based authentication for security. Accepts credentials from any Telegram account type.",
-    "version": "2.2.0",
+    "version": "2.3.0",
     "contact": {
       "name": "API Support",
       "email": "support@example.com"
@@ -1004,6 +1004,619 @@
                   "description": "Reply to message info",
                   "nullable": true
                 }
+              }
+            }
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if operation failed"
+          }
+        }
+      },
+      "ClearHistoryResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the operation was successful"
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if operation failed"
+          }
+        }
+      },
+      "DeleteChatResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the operation was successful"
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if operation failed"
+          }
+        }
+      },
+      "GetChatAdminsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the operation was successful"
+          },
+          "admins": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Admin user ID"
+                },
+                "username": {
+                  "type": "string",
+                  "description": "Admin username"
+                },
+                "firstName": {
+                  "type": "string",
+                  "description": "Admin first name"
+                },
+                "lastName": {
+                  "type": "string",
+                  "description": "Admin last name"
+                },
+                "isBot": {
+                  "type": "boolean",
+                  "description": "Whether admin is a bot"
+                },
+                "canEdit": {
+                  "type": "boolean",
+                  "description": "Can edit messages"
+                },
+                "canDelete": {
+                  "type": "boolean",
+                  "description": "Can delete messages"
+                },
+                "canInvite": {
+                  "type": "boolean",
+                  "description": "Can invite users"
+                },
+                "canRestrict": {
+                  "type": "boolean",
+                  "description": "Can restrict users"
+                },
+                "canPin": {
+                  "type": "boolean",
+                  "description": "Can pin messages"
+                },
+                "canPromote": {
+                  "type": "boolean",
+                  "description": "Can promote users"
+                }
+              }
+            }
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if operation failed"
+          }
+        }
+      },
+      "GetChatPhotoResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the operation was successful"
+          },
+          "photo": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Photo ID"
+              },
+              "dcId": {
+                "type": "number",
+                "description": "Data center ID"
+              },
+              "hasVideo": {
+                "type": "boolean",
+                "description": "Whether photo has video"
+              },
+              "strippedThumb": {
+                "type": "string",
+                "description": "Stripped thumbnail"
+              }
+            },
+            "nullable": true
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if operation failed"
+          }
+        }
+      },
+      "SendAlbumResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the operation was successful"
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number",
+                  "description": "Message ID"
+                },
+                "text": {
+                  "type": "string",
+                  "description": "Message text"
+                },
+                "date": {
+                  "type": "number",
+                  "description": "Message timestamp"
+                },
+                "fromId": {
+                  "type": "string",
+                  "description": "Sender user ID"
+                },
+                "peerId": {
+                  "type": "string",
+                  "description": "Chat/peer ID"
+                },
+                "media": {
+                  "type": "object",
+                  "description": "Media object",
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if operation failed"
+          }
+        }
+      },
+      "SendStickerResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the operation was successful"
+          },
+          "message": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number",
+                "description": "Message ID"
+              },
+              "text": {
+                "type": "string",
+                "description": "Message text"
+              },
+              "date": {
+                "type": "number",
+                "description": "Message timestamp"
+              },
+              "fromId": {
+                "type": "string",
+                "description": "Sender user ID"
+              },
+              "peerId": {
+                "type": "string",
+                "description": "Chat/peer ID"
+              },
+              "media": {
+                "type": "object",
+                "description": "Sticker media object"
+              }
+            }
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if operation failed"
+          }
+        }
+      },
+      "SendVideoResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the operation was successful"
+          },
+          "message": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number",
+                "description": "Message ID"
+              },
+              "text": {
+                "type": "string",
+                "description": "Message text"
+              },
+              "date": {
+                "type": "number",
+                "description": "Message timestamp"
+              },
+              "fromId": {
+                "type": "string",
+                "description": "Sender user ID"
+              },
+              "peerId": {
+                "type": "string",
+                "description": "Chat/peer ID"
+              },
+              "media": {
+                "type": "object",
+                "description": "Video media object"
+              }
+            }
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if operation failed"
+          }
+        }
+      },
+      "SendVoiceResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the operation was successful"
+          },
+          "message": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number",
+                "description": "Message ID"
+              },
+              "text": {
+                "type": "string",
+                "description": "Message text"
+              },
+              "date": {
+                "type": "number",
+                "description": "Message timestamp"
+              },
+              "fromId": {
+                "type": "string",
+                "description": "Sender user ID"
+              },
+              "peerId": {
+                "type": "string",
+                "description": "Chat/peer ID"
+              },
+              "media": {
+                "type": "object",
+                "description": "Voice media object"
+              }
+            }
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if operation failed"
+          }
+        }
+      },
+      "GetMessageReactionsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the operation was successful"
+          },
+          "reactions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "emoji": {
+                  "type": "string",
+                  "description": "Reaction emoji"
+                },
+                "count": {
+                  "type": "number",
+                  "description": "Number of reactions"
+                },
+                "users": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "User ID"
+                      },
+                      "username": {
+                        "type": "string",
+                        "description": "Username"
+                      },
+                      "firstName": {
+                        "type": "string",
+                        "description": "First name"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if operation failed"
+          }
+        }
+      },
+      "SetMessageReactionResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the operation was successful"
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if operation failed"
+          }
+        }
+      },
+      "BlockUserResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the operation was successful"
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if operation failed"
+          }
+        }
+      },
+      "UnblockUserResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the operation was successful"
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if operation failed"
+          }
+        }
+      },
+      "GetCommonChatsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the operation was successful"
+          },
+          "chats": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Chat ID"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Chat title"
+                },
+                "type": {
+                  "type": "string",
+                  "description": "Chat type"
+                },
+                "participantsCount": {
+                  "type": "number",
+                  "description": "Number of participants"
+                }
+              }
+            }
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if operation failed"
+          }
+        }
+      },
+      "GetUserStatusResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the operation was successful"
+          },
+          "status": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Status type (online, offline, recently, within_week, within_month, long_time_ago)"
+              },
+              "wasOnline": {
+                "type": "number",
+                "description": "Last seen timestamp",
+                "nullable": true
+              }
+            }
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if operation failed"
+          }
+        }
+      },
+      "SearchUsersResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the operation was successful"
+          },
+          "users": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "User ID"
+                },
+                "username": {
+                  "type": "string",
+                  "description": "Username"
+                },
+                "firstName": {
+                  "type": "string",
+                  "description": "First name"
+                },
+                "lastName": {
+                  "type": "string",
+                  "description": "Last name"
+                },
+                "isBot": {
+                  "type": "boolean",
+                  "description": "Whether user is a bot"
+                },
+                "isPremium": {
+                  "type": "boolean",
+                  "description": "Whether user has Telegram Premium"
+                }
+              }
+            }
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if operation failed"
+          }
+        }
+      },
+      "GetGiveawayInfoResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the operation was successful"
+          },
+          "giveaway": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Giveaway ID"
+              },
+              "title": {
+                "type": "string",
+                "description": "Giveaway title"
+              },
+              "description": {
+                "type": "string",
+                "description": "Giveaway description"
+              },
+              "participantsCount": {
+                "type": "number",
+                "description": "Number of participants"
+              },
+              "winnersCount": {
+                "type": "number",
+                "description": "Number of winners"
+              },
+              "endDate": {
+                "type": "number",
+                "description": "End date timestamp"
+              },
+              "isActive": {
+                "type": "boolean",
+                "description": "Whether giveaway is active"
+              }
+            }
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if operation failed"
+          }
+        }
+      },
+      "GetPaymentReceiptResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the operation was successful"
+          },
+          "receipt": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Receipt ID"
+              },
+              "date": {
+                "type": "number",
+                "description": "Payment date"
+              },
+              "amount": {
+                "type": "number",
+                "description": "Payment amount"
+              },
+              "currency": {
+                "type": "string",
+                "description": "Payment currency"
+              },
+              "description": {
+                "type": "string",
+                "description": "Payment description"
+              },
+              "provider": {
+                "type": "string",
+                "description": "Payment provider"
+              }
+            }
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if operation failed"
+          }
+        }
+      },
+      "SendPaymentFormResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the operation was successful"
+          },
+          "result": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Payment ID"
+              },
+              "status": {
+                "type": "string",
+                "description": "Payment status"
+              },
+              "receipt": {
+                "type": "object",
+                "description": "Payment receipt"
               }
             }
           },
@@ -6350,6 +6963,2379 @@
               "application/json": {
                 "schema": {
                   "": "#/components/schemas/EditMessageResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chats/clear-history": {
+      "post": {
+        "summary": "Clear Chat History",
+        "description": "Clear message history for a chat",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "chatId"
+                ],
+                "properties": {
+                  "chatId": {
+                    "type": "string",
+                    "description": "Chat ID"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClearHistoryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chats/delete-chat": {
+      "post": {
+        "summary": "Delete Chat",
+        "description": "Delete a chat",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "chatId"
+                ],
+                "properties": {
+                  "chatId": {
+                    "type": "string",
+                    "description": "Chat ID"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteChatResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chats/get-chat-admins": {
+      "post": {
+        "summary": "Get Chat Admins",
+        "description": "Get list of chat administrators",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "chatId"
+                ],
+                "properties": {
+                  "chatId": {
+                    "type": "string",
+                    "description": "Chat ID"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetChatAdminsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/media/get-chat-photo": {
+      "post": {
+        "summary": "Get Chat Photo",
+        "description": "Get chat profile photo",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "chatId"
+                ],
+                "properties": {
+                  "chatId": {
+                    "type": "string",
+                    "description": "Chat ID"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetChatPhotoResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/media/send-album": {
+      "post": {
+        "summary": "Send Album",
+        "description": "Send multiple photos as an album",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "chatId",
+                  "photos"
+                ],
+                "properties": {
+                  "chatId": {
+                    "type": "string",
+                    "description": "Chat ID"
+                  },
+                  "photos": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Array of photo URLs or file paths"
+                  },
+                  "caption": {
+                    "type": "string",
+                    "description": "Album caption"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendAlbumResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/media/send-sticker": {
+      "post": {
+        "summary": "Send Sticker",
+        "description": "Send a sticker to a chat",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "chatId",
+                  "sticker"
+                ],
+                "properties": {
+                  "chatId": {
+                    "type": "string",
+                    "description": "Chat ID"
+                  },
+                  "sticker": {
+                    "type": "string",
+                    "description": "Sticker file path or URL"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendStickerResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/media/send-video": {
+      "post": {
+        "summary": "Send Video",
+        "description": "Send a video to a chat",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "chatId",
+                  "video"
+                ],
+                "properties": {
+                  "chatId": {
+                    "type": "string",
+                    "description": "Chat ID"
+                  },
+                  "video": {
+                    "type": "string",
+                    "description": "Video file path or URL"
+                  },
+                  "caption": {
+                    "type": "string",
+                    "description": "Video caption"
+                  },
+                  "duration": {
+                    "type": "number",
+                    "description": "Video duration in seconds"
+                  },
+                  "width": {
+                    "type": "number",
+                    "description": "Video width"
+                  },
+                  "height": {
+                    "type": "number",
+                    "description": "Video height"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendVideoResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/media/send-voice": {
+      "post": {
+        "summary": "Send Voice Message",
+        "description": "Send a voice message to a chat",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "chatId",
+                  "voice"
+                ],
+                "properties": {
+                  "chatId": {
+                    "type": "string",
+                    "description": "Chat ID"
+                  },
+                  "voice": {
+                    "type": "string",
+                    "description": "Voice file path or URL"
+                  },
+                  "duration": {
+                    "type": "number",
+                    "description": "Voice duration in seconds"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendVoiceResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/messages/get-message-reactions": {
+      "post": {
+        "summary": "Get Message Reactions",
+        "description": "Get reactions for a specific message",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "chatId",
+                  "messageId"
+                ],
+                "properties": {
+                  "chatId": {
+                    "type": "string",
+                    "description": "Chat ID"
+                  },
+                  "messageId": {
+                    "type": "number",
+                    "description": "Message ID"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetMessageReactionsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/messages/set-message-reaction": {
+      "post": {
+        "summary": "Set Message Reaction",
+        "description": "Set reaction on a specific message",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "chatId",
+                  "messageId",
+                  "reaction"
+                ],
+                "properties": {
+                  "chatId": {
+                    "type": "string",
+                    "description": "Chat ID"
+                  },
+                  "messageId": {
+                    "type": "number",
+                    "description": "Message ID"
+                  },
+                  "reaction": {
+                    "type": "string",
+                    "description": "Reaction emoji"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SetMessageReactionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/block-user": {
+      "post": {
+        "summary": "Block User",
+        "description": "Block a user",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "description": "User ID to block"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlockUserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/unblock-user": {
+      "post": {
+        "summary": "Unblock User",
+        "description": "Unblock a user",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "description": "User ID to unblock"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnblockUserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/get-common-chats": {
+      "post": {
+        "summary": "Get Common Chats",
+        "description": "Get common chats with a user",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "description": "User ID"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetCommonChatsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/get-user-status": {
+      "post": {
+        "summary": "Get User Status",
+        "description": "Get user online status",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "description": "User ID"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetUserStatusResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/search-users": {
+      "post": {
+        "summary": "Search Users",
+        "description": "Search for users by query",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "Search query"
+                  },
+                  "limit": {
+                    "type": "number",
+                    "default": 20,
+                    "description": "Maximum number of results"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchUsersResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/validate-session": {
+      "post": {
+        "summary": "Validate Session",
+        "description": "Validate Telegram session and get user info",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateSessionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payment/check-gift-code": {
+      "post": {
+        "summary": "Check Gift Code",
+        "description": "Check if a gift code is valid",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "code"
+                ],
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "description": "Gift code to check"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckGiftCodeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payment/get-giveaway-info": {
+      "post": {
+        "summary": "Get Giveaway Info",
+        "description": "Get information about a giveaway",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "peer",
+                  "msgId"
+                ],
+                "properties": {
+                  "peer": {
+                    "type": "string",
+                    "description": "Channel or chat ID"
+                  },
+                  "msgId": {
+                    "type": "number",
+                    "description": "Message ID containing giveaway"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetGiveawayInfoResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payment/get-payment-form": {
+      "post": {
+        "summary": "Get Payment Form",
+        "description": "Get payment form for an invoice",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "invoice"
+                ],
+                "properties": {
+                  "invoice": {
+                    "type": "object",
+                    "description": "Invoice object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetPaymentFormResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payment/get-payment-receipt": {
+      "post": {
+        "summary": "Get Payment Receipt",
+        "description": "Get payment receipt for a completed payment",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "msgId"
+                ],
+                "properties": {
+                  "msgId": {
+                    "type": "number",
+                    "description": "Message ID of payment"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetPaymentReceiptResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payment/send-payment-form": {
+      "post": {
+        "summary": "Send Payment Form",
+        "description": "Submit payment form for an invoice",
+        "security": [
+          {
+            "TelegramAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Api-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API ID"
+          },
+          {
+            "name": "X-Api-Hash",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram API Hash"
+          },
+          {
+            "name": "X-Session-String",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram session string"
+          },
+          {
+            "name": "X-User-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Telegram user ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "formId",
+                  "invoice",
+                  "credentials"
+                ],
+                "properties": {
+                  "formId": {
+                    "type": "string",
+                    "description": "Payment form ID"
+                  },
+                  "invoice": {
+                    "type": "object",
+                    "description": "Invoice object"
+                  },
+                  "credentials": {
+                    "type": "object",
+                    "description": "Payment credentials"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendPaymentFormResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
                 }
               }
             }
