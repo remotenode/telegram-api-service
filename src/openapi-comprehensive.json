@@ -297,48 +297,47 @@
         "type": "object",
         "properties": {
           "success": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the operation was successful"
           },
           "message": {
             "type": "object",
             "properties": {
               "id": {
-                "type": "number"
+                "type": "number",
+                "description": "Message ID"
               },
               "text": {
-                "type": "string"
+                "type": "string",
+                "description": "Message text"
               },
               "date": {
-                "type": "number"
+                "type": "number",
+                "description": "Message timestamp"
               },
-              "from_id": {
-                "type": "string"
+              "fromId": {
+                "type": "string",
+                "description": "Sender user ID"
               },
-              "peer_id": {
-                "type": "string"
+              "peerId": {
+                "type": "string",
+                "description": "Chat/peer ID"
               },
-              "reply_to": {
-                "type": "object"
+              "media": {
+                "type": "object",
+                "description": "Media object if present",
+                "nullable": true
               },
-              "entities": {
-                "type": "array"
+              "replyTo": {
+                "type": "object",
+                "description": "Reply to message info",
+                "nullable": true
               }
             }
           },
           "error": {
-            "type": "string"
-          }
-        },
-        "example": {
-          "success": true,
-          "message": {
-            "id": 12345,
-            "text": "Hello, world!",
-            "date": 1640995200,
-            "from_id": "123456789",
-            "peer_id": "987654321",
-            "reply_to": null,
-            "entities": []
+            "type": "string",
+            "description": "Error message if operation failed"
           }
         }
       },
@@ -346,7 +345,8 @@
         "type": "object",
         "properties": {
           "success": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the operation was successful"
           },
           "messages": {
             "type": "array",
@@ -354,37 +354,41 @@
               "type": "object",
               "properties": {
                 "id": {
-                  "type": "number"
+                  "type": "number",
+                  "description": "Message ID"
                 },
                 "text": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "Message text"
                 },
                 "date": {
-                  "type": "number"
+                  "type": "number",
+                  "description": "Message timestamp"
                 },
-                "from_id": {
-                  "type": "string"
+                "fromId": {
+                  "type": "string",
+                  "description": "Sender user ID"
                 },
-                "peer_id": {
-                  "type": "string"
-                },
-                "reply_to": {
-                  "type": "object"
-                },
-                "entities": {
-                  "type": "array"
+                "peerId": {
+                  "type": "string",
+                  "description": "Chat/peer ID"
                 },
                 "media": {
-                  "type": "object"
+                  "type": "object",
+                  "description": "Media object if present",
+                  "nullable": true
+                },
+                "replyTo": {
+                  "type": "object",
+                  "description": "Reply to message info",
+                  "nullable": true
                 }
               }
             }
           },
-          "total_count": {
-            "type": "number"
-          },
           "error": {
-            "type": "string"
+            "type": "string",
+            "description": "Error message if operation failed"
           }
         }
       },
@@ -392,33 +396,47 @@
         "type": "object",
         "properties": {
           "success": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the operation was successful"
           },
           "message": {
             "type": "object",
             "properties": {
               "id": {
-                "type": "number"
+                "type": "number",
+                "description": "Message ID"
               },
               "text": {
-                "type": "string"
+                "type": "string",
+                "description": "Message text"
               },
               "date": {
-                "type": "number"
+                "type": "number",
+                "description": "Message timestamp"
               },
-              "edit_date": {
-                "type": "number"
+              "fromId": {
+                "type": "string",
+                "description": "Sender user ID"
               },
-              "from_id": {
-                "type": "string"
+              "peerId": {
+                "type": "string",
+                "description": "Chat/peer ID"
               },
-              "peer_id": {
-                "type": "string"
+              "media": {
+                "type": "object",
+                "description": "Media object if present",
+                "nullable": true
+              },
+              "replyTo": {
+                "type": "object",
+                "description": "Reply to message info",
+                "nullable": true
               }
             }
           },
           "error": {
-            "type": "string"
+            "type": "string",
+            "description": "Error message if operation failed"
           }
         }
       },
@@ -941,6 +959,57 @@
           },
           "error": {
             "type": "string"
+          }
+        }
+      },
+      "GetMessageHistoryResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the operation was successful"
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number",
+                  "description": "Message ID"
+                },
+                "text": {
+                  "type": "string",
+                  "description": "Message text"
+                },
+                "date": {
+                  "type": "number",
+                  "description": "Message timestamp"
+                },
+                "fromId": {
+                  "type": "string",
+                  "description": "Sender user ID"
+                },
+                "peerId": {
+                  "type": "string",
+                  "description": "Chat/peer ID"
+                },
+                "media": {
+                  "type": "object",
+                  "description": "Media object if present",
+                  "nullable": true
+                },
+                "replyTo": {
+                  "type": "object",
+                  "description": "Reply to message info",
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if operation failed"
           }
         }
       }
