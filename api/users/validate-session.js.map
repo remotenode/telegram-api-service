@@ -1,0 +1,1 @@
+{"version":3,"file":"validate-session.js","sourceRoot":"","sources":["validate-session.ts"],"names":[],"mappings":";;AACA,2DAA8D;AAE9D;;;GAGG;AACH,kBAAe,IAAA,6BAAgB,EAC7B,KAAK,EAAE,eAAgC,EAAE,EAAE;IACzC,OAAO,MAAM,eAAe,CAAC,eAAe,EAAE,CAAC;AACjD,CAAC,EACD;IACE,WAAW,EAAE,KAAK,CAAC,0CAA0C;CAC9D,CACF,CAAC"}

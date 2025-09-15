@@ -1,0 +1,33 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = handler;
+const openapi_comprehensive_json_1 = __importDefault(require("../src/openapi-comprehensive.json"));
+function handler(req, res) {
+    // Set CORS headers
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+    }
+    if (req.method === 'GET') {
+        // Update server URL to current host
+        const spec = JSON.parse(JSON.stringify(openapi_comprehensive_json_1.default));
+        // Get the host from request headers
+        const protocol = req.headers['x-forwarded-proto'] || 'https';
+        const host = req.headers['host'] || 'telegram-api.aso.market';
+        if (spec.servers && spec.servers.length > 0) {
+            spec.servers[0].url = `${protocol}://${host}`;
+        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200).json(spec);
+    }
+    else {
+        res.status(405).json({ error: 'Method not allowed' });
+    }
+}
+//# sourceMappingURL=openapi-comprehensive.js.map
