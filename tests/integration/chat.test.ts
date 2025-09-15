@@ -6,7 +6,7 @@ export async function testChatOperations(credentials: TestCredentials): Promise<
   try {
     await framework.setup();
 
-    const account2Id = (await framework['account2'].user.validateSession()).userInfo!.id;
+    const account2Id = (await framework['account2'].user.validateSession()).user!.id;
 
     // Get dialogs
     await framework.runTest('Get Dialogs', async (account1) => {
@@ -27,7 +27,7 @@ export async function testChatOperations(credentials: TestCredentials): Promise<
       const group = await account1.chat.createGroup(`Archive Test ${Date.now()}`, [account2Id]);
       if (!group.success) throw new Error('Create group failed');
       
-      const result = await account1.chat.archiveChat(group.chat!.id, true);
+      const result = await account1.chat.archiveChat(group.group!.id);
       if (!result.success) throw new Error('Archive failed');
       return result;
     });

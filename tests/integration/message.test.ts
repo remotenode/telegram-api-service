@@ -6,7 +6,7 @@ export async function testMessageOperations(credentials: TestCredentials): Promi
   try {
     await framework.setup();
 
-    const account2Id = (await framework['account2'].user.validateSession()).userInfo!.id;
+    const account2Id = (await framework['account2'].user.validateSession()).user!.id;
 
     // Send message
     await framework.runTest('Send Message', async (account1) => {
@@ -15,10 +15,10 @@ export async function testMessageOperations(credentials: TestCredentials): Promi
       return result;
     });
 
-    // Get messages
-    await framework.runTest('Get Messages', async (account1) => {
-      const result = await account1.message.getMessages(account2Id, 10);
-      if (!result.success) throw new Error('Get messages failed');
+    // Get message history
+    await framework.runTest('Get Message History', async (account1) => {
+      const result = await account1.message.getMessageHistory(account2Id, 10);
+      if (!result.success) throw new Error('Get message history failed');
       return result;
     });
 

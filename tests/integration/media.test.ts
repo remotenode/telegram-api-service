@@ -6,7 +6,7 @@ export async function testMediaOperations(credentials: TestCredentials): Promise
   try {
     await framework.setup();
 
-    const account2Id = (await framework['account2'].user.validateSession()).userInfo!.id;
+    const account2Id = (await framework['account2'].user.validateSession()).user!.id;
 
     // Send photo
     await framework.runTest('Send Photo', async (account1) => {
@@ -22,7 +22,7 @@ export async function testMediaOperations(credentials: TestCredentials): Promise
     await framework.runTest('Send Document', async (account1) => {
       const document = TestDataGenerator.generateTestDocument();
       const result = await account1.media.sendDocument(account2Id, document, {
-        filename: 'test.txt',
+        fileName: 'test.txt',
         caption: 'Test document'
       });
       if (!result.success) throw new Error('Send document failed');
@@ -34,7 +34,7 @@ export async function testMediaOperations(credentials: TestCredentials): Promise
       const sent = await account1.media.sendPhoto(account2Id, TestDataGenerator.generateTestPhoto());
       if (!sent.success) throw new Error('Send photo failed');
       
-      const result = await account1.media.downloadMedia(sent.message);
+      const result = await account1.media.downloadMedia(account2Id, sent.message.id);
       if (!result.success) throw new Error('Download failed');
       return result;
     });

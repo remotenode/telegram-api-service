@@ -19,15 +19,9 @@ export default createApiHandler(
       throw new Error('Chat ID is required');
     }
 
-    return await telegramService.message.getMessages(chatId, limit, {
-      offsetId,
-      offsetDate,
-      addOffset,
-      maxId,
-      minId,
-      search,
-      fromUser
-    });
+    // For now, use getMessageHistory with basic parameters
+    // TODO: Implement advanced filtering in messageOperations
+    return await telegramService.message.getMessageHistory(chatId, limit, offsetId);
   },
   {
     requireBody: true,

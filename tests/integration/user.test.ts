@@ -22,7 +22,7 @@ export async function testUserOperations(credentials: TestCredentials): Promise<
     // Get users
     await framework.runTest('Get Users', async (account1, account2) => {
       const account2Info = await account2.user.validateSession();
-      const result = await account1.user.getUsers([account2Info.userInfo!.id]);
+      const result = await account1.user.getUsers([account2Info.user!.id]);
       
       if (!result.success || !result.users?.length) {
         throw new Error('Failed to get users');
